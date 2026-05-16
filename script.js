@@ -816,9 +816,19 @@ async function authInit() {
     const cached = JSON.parse(session);
     _currentUser = cached;
     _setLoggedIn(cached.username, cached.is_admin);
-    // Supabase'den güncel is_admin çek (admin yetki değişikliği anında yansısın)
+    // Supabase'den güncel profil çek
     const fresh = await sbGetProfile(cached.username);
-    if (fresh && fresh.is_admin !== cached.is_admin) {
+    if (!fresh) {
+      // Kullanıcı adı değişmiş ya da hesap silinmiş — oturumu temizle
+      localStorage.removeItem('periodSession');
+      _currentUser = null;
+      document.getElementById('authGuest').style.display = '';
+      document.getElementById('authUser').style.display  = 'none';
+      const adminBtn = document.getElementById('adminNavBtn');
+      if (adminBtn) adminBtn.style.display = 'none';
+      return;
+    }
+    if (fresh.is_admin !== cached.is_admin) {
       _currentUser.is_admin = fresh.is_admin;
       localStorage.setItem('periodSession', JSON.stringify(_currentUser));
       _setLoggedIn(_currentUser.username, _currentUser.is_admin);
