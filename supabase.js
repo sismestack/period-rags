@@ -2,7 +2,7 @@
    PERIOD RAGS — SUPABASE CLIENT
    ============================================================ */
 
-const SUPABASE_URL  = 'https://sjhdkqwuyajrqwznuvqc.supabase.co';
+const SUPABASE_URL  = 'https://sjhdkjwuyajrqwznuvqc.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqaGRrand1eWFqcnF3em51dnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg5MzE2ODcsImV4cCI6MjA5NDUwNzY4N30.XJ3chNTj-W0BQK7SDgVhNxWJt6ieGVyXoshUHCZLh_U';
 
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
