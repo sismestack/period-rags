@@ -631,222 +631,105 @@ function viewFullLeaderboard() {
 
 class PeriodWheel {
   constructor() {
-    this.canvas = document.getElementById('wheelCanvas');
-    if (!this.canvas) return;
-    this.ctx = this.canvas.getContext('2d');
-
+    // Dilimler saat yönünde, tepedeki kafatası sınırından başlayarak:
+    // 0=Tanışalım mı Kokteyl (22.5°), 1=Bira (67.5°), 2=5.000$ (112.5°),
+    // 3=%50 İndirim (157.5°), 4=Bedava Bira (202.5°), 5=Premium Viski (247.5°),
+    // 6=Büyük Ödül Nightblade (292.5°), 7=Adri Special (337.5°)
     this.prizes = [
-      { label: 'Ücretsiz İçki', color: '#4a0000', borderColor: '#cc2222', textColor: '#ffaaaa' },
-      { label: '%50 İndirim',   color: '#2a1800', borderColor: '#cc8800', textColor: '#ffcc66' },
-      { label: 'Mystery Shot',  color: '#1a0535', borderColor: '#8833cc', textColor: '#cc88ff' },
-      { label: 'Adri Special',  color: '#3d0000', borderColor: '#ff0000', textColor: '#ffdddd' },
-      { label: 'Tekrar Dene',   color: '#0a1a0a', borderColor: '#228822', textColor: '#aaffaa' },
-      { label: 'JACKPOT!',      color: '#1a1400', borderColor: '#ccaa00', textColor: '#ffd700' },
+      { label: 'Tanışalım mı Kokteyl',  weight: 3,     icon: '🍹', rarity: 'ÇOK ZOR'              },
+      { label: 'Bira',                  weight: 14.99, icon: '🍺', rarity: ''                      },
+      { label: '5.000$',               weight: 0.01,  icon: '💵', rarity: 'NEREDEYSE İMKANSIZ'    },
+      { label: '%50 İndirim',           weight: 47,    icon: '%',  rarity: 'EN ÇOK ÇIKAN'          },
+      { label: 'Bedava Bira',           weight: 22,    icon: '🍺', rarity: ''                      },
+      { label: 'Premium Viski',         weight: 10,    icon: '🥃', rarity: 'ZOR'                   },
+      { label: 'Büyük Ödül Nightblade', weight: 0,     icon: '🏍', rarity: 'İMKANSIZ'             },
+      { label: 'Adri Special',          weight: 3,     icon: '⭐', rarity: 'AŞIRI ZOR'             },
     ];
 
-    this.numPrizes = this.prizes.length;
-    this.sliceAngle = (2 * Math.PI) / this.numPrizes;
-
-    this.currentAngle = -Math.PI / 2; // Start with first prize at top
+    this.numPrizes  = this.prizes.length; // 8
+    this.sliceAngle = 360 / this.numPrizes; // 45°
+    this.currentRotation = 0; // birikimli saat yönü dönüş (derece)
     this.spinning = false;
-    this.highlightIndex = -1;
 
-    this.draw();
+    this.container = document.getElementById('wheelImgContainer');
   }
 
-  draw() {
-    const ctx = this.ctx;
-    const W = this.canvas.width;
-    const H = this.canvas.height;
-    const cx = W / 2;
-    const cy = H / 2;
-    const outerR = Math.min(cx, cy) - 8;
-    const innerR = 28;
-
-    ctx.clearRect(0, 0, W, H);
-
-    // Outer glow ring
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(cx, cy, outerR + 4, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(204,0,0,0.3)';
-    ctx.lineWidth = 8;
-    ctx.stroke();
-    ctx.restore();
-
-    // Draw slices
-    for (let i = 0; i < this.numPrizes; i++) {
-      const prize = this.prizes[i];
-      const startA = this.currentAngle + i * this.sliceAngle;
-      const endA = startA + this.sliceAngle;
-      const midA = startA + this.sliceAngle / 2;
-
-      // Slice fill
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, outerR, startA, endA);
-      ctx.closePath();
-
-      // Highlight winning slice
-      if (i === this.highlightIndex) {
-        ctx.fillStyle = prize.borderColor;
-        ctx.shadowBlur = 30;
-        ctx.shadowColor = prize.borderColor;
-      } else {
-        ctx.fillStyle = prize.color;
-        ctx.shadowBlur = 0;
-      }
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      // Slice border
-      ctx.beginPath();
-      ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, outerR, startA, endA);
-      ctx.closePath();
-      ctx.strokeStyle = prize.borderColor;
-      ctx.lineWidth = i === this.highlightIndex ? 2.5 : 1.5;
-      ctx.stroke();
-
-      // Text
-      ctx.save();
-      ctx.translate(cx, cy);
-      ctx.rotate(midA);
-
-      // Text shadow
-      ctx.shadowBlur = 4;
-      ctx.shadowColor = 'rgba(0,0,0,0.8)';
-
-      // Prize label
-      const textR = outerR * 0.62;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = prize.textColor;
-      ctx.font = prize.label.length > 8 ? 'bold 12px Oswald, sans-serif' : 'bold 13px Oswald, sans-serif';
-
-      // Multi-line for long text
-      const words = prize.label.split(' ');
-      if (words.length > 1 && prize.label.length > 8) {
-        const mid = Math.ceil(words.length / 2);
-        const line1 = words.slice(0, mid).join(' ');
-        const line2 = words.slice(mid).join(' ');
-        ctx.fillText(line1, textR, -7);
-        ctx.fillText(line2, textR, 7);
-      } else {
-        ctx.fillText(prize.label, textR, 0);
-      }
-
-      ctx.shadowBlur = 0;
-      ctx.restore();
+  _pickWinner() {
+    const totalWeight = this.prizes.reduce((s, p) => s + p.weight, 0);
+    let r = Math.random() * totalWeight;
+    for (let i = 0; i < this.prizes.length; i++) {
+      r -= this.prizes[i].weight;
+      if (r <= 0) return i;
     }
-
-    // Outer border ring
-    ctx.beginPath();
-    ctx.arc(cx, cy, outerR, 0, 2 * Math.PI);
-    ctx.strokeStyle = 'rgba(204,0,0,0.6)';
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    // Inner hub
-    const hubGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, innerR);
-    hubGrad.addColorStop(0, '#2a0000');
-    hubGrad.addColorStop(1, '#0a0505');
-    ctx.beginPath();
-    ctx.arc(cx, cy, innerR, 0, 2 * Math.PI);
-    ctx.fillStyle = hubGrad;
-    ctx.fill();
-    ctx.strokeStyle = '#cc0000';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Hub skull icon
-    ctx.fillStyle = 'rgba(204,0,0,0.8)';
-    ctx.font = 'bold 18px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('☠', cx, cy);
+    // fallback: ilk pozitif ağırlıklı dilim
+    return this.prizes.findIndex(p => p.weight > 0);
   }
 
   spin() {
-    if (this.spinning) return;
+    if (this.spinning || !this.container) return;
     this.spinning = true;
-    this.highlightIndex = -1;
 
     const spinBtn = document.getElementById('spinBtn');
     const resultBox = document.getElementById('wheelResultBox');
     if (spinBtn) spinBtn.disabled = true;
     if (resultBox) resultBox.style.display = 'none';
 
-    // Randomize total rotation: 5–10 full spins + random stop angle
-    const minSpins = 5;
-    const extraSpins = minSpins + Math.random() * 5;
-    const stopAngle = Math.random() * 2 * Math.PI;
-    const totalAngle = extraSpins * 2 * Math.PI + stopAngle;
+    document.querySelectorAll('.prize-row').forEach(row => {
+      row.style.borderLeftColor = '';
+      row.style.background = '';
+    });
 
-    const duration = 3500 + Math.random() * 1500;
-    const startTime = performance.now();
-    const startAngle = this.currentAngle;
+    const winnerIndex = this._pickWinner();
 
-    const animate = (now) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+    // CSS rotate(θ) saat yönünde θ derece döndürür.
+    // rotate(θ) sonrası tepede (0°) gösterilen dilim: orijinal görüntüde (360-θ)°'de olanlar.
+    // Dilim i merkezi orijinal görüntüde: i*45+22.5°
+    // Dilim i'yi tepeye getirmek için: θ = 360 - (i*45+22.5)
+    const winnerCenter = winnerIndex * this.sliceAngle + this.sliceAngle / 2;
+    const targetBase   = (360 - winnerCenter + 360) % 360;
 
-      // Ease out quintic
-      const eased = 1 - Math.pow(1 - progress, 5);
+    const currentMod = ((this.currentRotation % 360) + 360) % 360;
+    let delta = (targetBase - currentMod + 360) % 360;
+    if (delta < 1) delta += 360; // en az 1 tam tur fazladan
 
-      this.currentAngle = startAngle + totalAngle * eased;
-      this.draw();
+    const extraSpins   = 5 + Math.floor(Math.random() * 4); // 5–8 tam tur
+    const finalRotation = this.currentRotation + extraSpins * 360 + delta;
+    const duration      = 4500 + Math.random() * 1500; // 4.5–6 sn
 
-      if (progress < 1) {
-        requestAnimationFrame(animate);
-      } else {
-        this.spinning = false;
-        this.currentAngle = startAngle + totalAngle;
-        this._onSpinEnd(spinBtn, resultBox);
-      }
-    };
+    this.container.style.transition = `transform ${duration}ms cubic-bezier(0.17,0.67,0.12,0.99)`;
+    this.container.style.transform  = `rotate(${finalRotation}deg)`;
+    this.currentRotation = finalRotation;
 
-    requestAnimationFrame(animate);
+    setTimeout(() => {
+      this.spinning = false;
+      this.container.style.transition = 'none';
+      this._onSpinEnd(spinBtn, resultBox, winnerIndex);
+    }, duration + 80);
   }
 
-  _onSpinEnd(spinBtn, resultBox) {
-    // The pointer is at the top (12 o'clock = -PI/2).
-    // Wheel segments start at currentAngle going clockwise.
-    // Normalize angle to find which slice is at pointer (top).
-    const pointerAngle = -Math.PI / 2;
-    let relAngle = ((pointerAngle - this.currentAngle) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
-    const winnerIndex = Math.floor(relAngle / this.sliceAngle) % this.numPrizes;
+  _onSpinEnd(spinBtn, resultBox, winnerIndex) {
     const winner = this.prizes[winnerIndex];
-
-    this.highlightIndex = winnerIndex;
-    this.draw();
 
     if (resultBox) {
       resultBox.style.display = 'block';
-      const resultText = document.getElementById('wheelResultText');
-      if (resultText) resultText.textContent = winner.label;
+      const el = document.getElementById('wheelResultText');
+      if (el) el.textContent = winner.label;
     }
 
-    if (spinBtn) {
-      setTimeout(() => {
-        spinBtn.disabled = false;
-      }, 3000);
-    }
-
-    // Highlight prize row in list
     document.querySelectorAll('.prize-row').forEach((row, i) => {
-      row.style.borderLeftColor = i === winnerIndex ? winner.borderColor : '';
-      row.style.background = i === winnerIndex ? 'rgba(204,0,0,0.15)' : '';
+      if (i === winnerIndex) {
+        row.style.borderLeftColor = '#cc0000';
+        row.style.background = 'rgba(204,0,0,0.18)';
+        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
     });
+
+    if (spinBtn) setTimeout(() => { spinBtn.disabled = false; }, 3000);
   }
 }
 
 function initWheel() {
-  if (!wheelGame) {
-    wheelGame = new PeriodWheel();
-  } else {
-    wheelGame.draw();
-  }
+  if (!wheelGame) wheelGame = new PeriodWheel();
 }
 
 function spinWheel() {

@@ -1563,12 +1563,12 @@ ul { list-style: none; }
   padding-bottom: 10px;
 }
 
-.prizes-list { display: flex; flex-direction: column; gap: 6px; }
+.prizes-list { display: flex; flex-direction: column; gap: 5px; }
 .prize-row {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-left: 2px solid transparent;
@@ -1578,7 +1578,21 @@ ul { list-style: none; }
 .jackpot-row { border-color: rgba(201,162,39,0.3); background: linear-gradient(135deg, #1a1200, #120e00); }
 .jackpot-row:hover { border-left-color: var(--gold); }
 .pr-icon { font-size: 1rem; width: 24px; text-align: center; }
-.pr-name { font-size: 0.78rem; font-weight: 600; color: var(--text); letter-spacing: 0.04em; }
+.pr-name { font-size: 0.78rem; font-weight: 600; color: var(--text); letter-spacing: 0.04em; flex: 1; }
+.pr-rarity {
+  font-size: 0.52rem;
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  font-family: var(--font-body);
+  padding: 2px 6px;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+.rarity-common   { color: #44cc44; background: rgba(40,120,40,0.18); border: 1px solid rgba(40,180,40,0.3); }
+.rarity-hard     { color: #cc8800; background: rgba(120,80,0,0.18);  border: 1px solid rgba(180,120,0,0.3); }
+.rarity-vhard    { color: #cc4400; background: rgba(120,40,0,0.18);  border: 1px solid rgba(180,60,0,0.3); }
+.rarity-ehard    { color: #dd2222; background: rgba(140,20,0,0.18);  border: 1px solid rgba(200,30,0,0.3); }
+.rarity-impossible { color: var(--gold-text); background: rgba(100,80,0,0.18); border: 1px solid rgba(180,140,0,0.35); }
 
 .wheel-center-col {
   display: flex;
@@ -1609,11 +1623,21 @@ ul { list-style: none; }
   to   { text-shadow: 0 0 20px rgba(204,0,0,0.9), 0 0 40px rgba(204,0,0,0.4); }
 }
 
-#wheelCanvas {
+.wheel-img-container {
+  width: 460px;
+  height: 460px;
+  will-change: transform;
   display: block;
-  filter: drop-shadow(0 0 24px rgba(204,0,0,0.25));
-  border-radius: 50%;
-  border: 2px solid rgba(204,0,0,0.25);
+  filter: drop-shadow(0 0 32px rgba(204,0,0,0.30));
+  user-select: none;
+}
+#wheelImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  pointer-events: none;
+  user-select: none;
 }
 
 .wheel-result-box {
