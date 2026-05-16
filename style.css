@@ -846,7 +846,71 @@ ul { list-style: none; }
 .drink-desc-small { font-size: 0.65rem; color: var(--text-dim); }
 .drink-price { font-family: var(--font-head); font-size: 0.88rem; font-weight: 700; color: var(--gold-text); white-space: nowrap; }
 
-/* Events preview */
+/* Ana sayfa mini etkinlik kartları */
+.home-events-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  margin-bottom: 4px;
+}
+.home-ev-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 2px solid transparent;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.22s var(--ease);
+}
+.home-ev-mini-card:hover {
+  border-left-color: var(--red);
+  background: var(--bg-hover);
+  transform: translateX(3px);
+}
+.home-ev-mini-img {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  background: var(--bg2) center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+.home-ev-mini-placeholder { font-size: 1.4rem; }
+.home-ev-mini-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.home-ev-mini-type {
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+  color: var(--red);
+  font-family: var(--font-body);
+  text-transform: uppercase;
+}
+.home-ev-mini-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-body);
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.home-ev-mini-date {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  font-family: var(--font-body);
+}
+
+/* Events preview (eski statik liste — artık kullanılmıyor ama CSS bozulmasın) */
 .events-preview-list { display: flex; flex-direction: column; gap: 12px; flex: 1; margin-bottom: 4px; }
 .ev-prev-item {
   display: flex;

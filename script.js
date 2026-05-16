@@ -798,9 +798,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Oturum geri yükle
   authInit();
-  // Etkinlik ve galeriyi yükle
+  // Etkinlik, galeri ve ana sayfa mini etkinlikleri yükle
   renderDynamicEvents();
   renderGallery();
+  renderHomeEvents();
 });
 
 /* ============================================================
@@ -1190,6 +1191,32 @@ async function adminToggleUserAdmin(username, currentIsAdmin) {
     await sbSetAdmin(username, !currentIsAdmin);
     await adminRenderUserList();
   } catch(err) { alert('Hata: ' + err.message); }
+}
+
+/* ============================================================
+   ANA SAYFA — MİNİ ETKİNLİK KARTI
+   ============================================================ */
+async function renderHomeEvents() {
+  const wrap = document.getElementById('homeEventsMini');
+  if (!wrap) return;
+  const events = await sbGetEvents();
+  if (!events.length) {
+    wrap.innerHTML = '<p style="font-size:0.75rem;color:var(--text-faint);letter-spacing:0.08em">Henüz etkinlik eklenmedi.</p>';
+    return;
+  }
+  // En fazla 3 etkinlik göster
+  wrap.innerHTML = events.slice(0, 3).map(ev => `
+    <div class="home-ev-mini-card" onclick="navigateTo('events')">
+      <div class="home-ev-mini-img" style="background-image:url('${ev.image_url || ''}')">
+        ${!ev.image_url ? '<span class="home-ev-mini-placeholder">🎸</span>' : ''}
+      </div>
+      <div class="home-ev-mini-info">
+        ${ev.type ? `<span class="home-ev-mini-type">${ev.type}</span>` : ''}
+        <span class="home-ev-mini-title">${ev.title}</span>
+        ${ev.date ? `<span class="home-ev-mini-date">📅 ${ev.date}${ev.time ? ' · ' + ev.time : ''}</span>` : ''}
+      </div>
+    </div>
+  `).join('');
 }
 
 async function renderGallery() {
