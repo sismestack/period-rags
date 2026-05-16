@@ -809,11 +809,22 @@ document.addEventListener('DOMContentLoaded', () => {
    ============================================================ */
 let _currentUser = null; // { username, is_admin }
 
-function authInit() {
+async function authInit() {
   const session = localStorage.getItem('periodSession');
-  if (session) {
-    try { _currentUser = JSON.parse(session); _setLoggedIn(_currentUser.username, _currentUser.is_admin); }
-    catch { localStorage.removeItem('periodSession'); }
+  if (!session) return;
+  try {
+    const cached = JSON.parse(session);
+    _currentUser = cached;
+    _setLoggedIn(cached.username, cached.is_admin);
+    // Supabase'den güncel is_admin çek (admin yetki değişikliği anında yansısın)
+    const fresh = await sbGetProfile(cached.username);
+    if (fresh && fresh.is_admin !== cached.is_admin) {
+      _currentUser.is_admin = fresh.is_admin;
+      localStorage.setItem('periodSession', JSON.stringify(_currentUser));
+      _setLoggedIn(_currentUser.username, _currentUser.is_admin);
+    }
+  } catch {
+    localStorage.removeItem('periodSession');
   }
 }
 
@@ -1189,6 +1200,12 @@ async function adminToggleUserAdmin(username, currentIsAdmin) {
   if (!confirm(`"${username}" kullanıcısını ${action} yapmak istediğine emin misin?`)) return;
   try {
     await sbSetAdmin(username, !currentIsAdmin);
+    // Aktif oturum bu kullanıcıya aitse session'ı da güncelle
+    if (_currentUser && _currentUser.username === username) {
+      _currentUser.is_admin = !currentIsAdmin;
+      localStorage.setItem('periodSession', JSON.stringify(_currentUser));
+      _setLoggedIn(_currentUser.username, _currentUser.is_admin);
+    }
     await adminRenderUserList();
   } catch(err) { alert('Hata: ' + err.message); }
 }

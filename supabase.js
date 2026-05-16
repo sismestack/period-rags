@@ -113,6 +113,11 @@ async function sbSetAdmin(username, is_admin) {
   if (error) throw error;
 }
 
+async function sbGetProfile(username) {
+  const { data } = await _sb.from('profiles').select('username, is_admin').eq('username', username).single();
+  return data || null;
+}
+
 /* ============================================================
    SKOR TABLOSU
    ============================================================ */
