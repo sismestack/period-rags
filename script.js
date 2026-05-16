@@ -926,6 +926,11 @@ function adminPreviewUrl(prefix) {
 
 function adminPreviewImage(input) {
   if (!input.files || !input.files[0]) return;
+  if (input.files[0].size > 400 * 1024) {
+    alert('Dosya çok büyük (max 400 KB). Lütfen görseli Imgur\'a yükleyip link ile ekleyin.');
+    input.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     adminPendingImage = e.target.result;
@@ -1152,6 +1157,11 @@ function galPreviewUrl() {
 
 function galPreviewImage(input) {
   if (!input.files || !input.files[0]) return;
+  if (input.files[0].size > 400 * 1024) {
+    alert('Dosya çok büyük (max 400 KB). Lütfen görseli Imgur\'a yükleyip link ile ekleyin.');
+    input.value = '';
+    return;
+  }
   const reader = new FileReader();
   reader.onload = (e) => {
     galPendingImage = e.target.result;
