@@ -705,11 +705,23 @@
 
               <div class="admin-field">
                 <label>AFİŞ / GÖRSEL</label>
-                <div class="admin-img-upload" onclick="document.getElementById('evImageFile').click()">
-                  <input type="file" id="evImageFile" accept="image/*" style="display:none" onchange="adminPreviewImage(this)">
-                  <div id="evImgPreview" class="admin-img-preview">
-                    <span>+ Görsel Yükle</span>
+                <div class="img-input-tabs">
+                  <button type="button" class="img-tab active" onclick="switchImgTab('ev','url')">🔗 Link ile Ekle</button>
+                  <button type="button" class="img-tab" onclick="switchImgTab('ev','file')">📁 Dosyadan Yükle</button>
+                </div>
+                <div id="evImgTabUrl" class="img-tab-panel">
+                  <input type="text" id="evImageUrl" placeholder="https://i.imgur.com/xxxx.jpg" oninput="adminPreviewUrl('ev')" style="width:100%">
+                </div>
+                <div id="evImgTabFile" class="img-tab-panel" style="display:none">
+                  <div class="admin-img-upload" onclick="document.getElementById('evImageFile').click()">
+                    <input type="file" id="evImageFile" accept="image/*" style="display:none" onchange="adminPreviewImage(this)">
+                    <div id="evImgPreview" class="admin-img-preview">
+                      <span>+ Görsel Yükle</span>
+                    </div>
                   </div>
+                </div>
+                <div id="evImgPreviewUrl" class="admin-url-preview" style="display:none">
+                  <img id="evImgPreviewUrlImg" src="" alt="">
                 </div>
               </div>
 
@@ -753,11 +765,23 @@
 
             <div class="admin-field">
               <label>FOTOĞRAF SEÇ</label>
-              <div class="admin-img-upload" onclick="document.getElementById('galImageFile').click()">
-                <input type="file" id="galImageFile" accept="image/*" style="display:none" onchange="galPreviewImage(this)">
-                <div id="galImgPreview" class="admin-img-preview" style="min-height:180px">
-                  <span>+ Fotoğraf Yükle</span>
+              <div class="img-input-tabs">
+                <button type="button" class="img-tab active" onclick="switchImgTab('gal','url')">🔗 Link ile Ekle</button>
+                <button type="button" class="img-tab" onclick="switchImgTab('gal','file')">📁 Dosyadan Yükle</button>
+              </div>
+              <div id="galImgTabUrl" class="img-tab-panel">
+                <input type="text" id="galImageUrl" placeholder="https://i.imgur.com/xxxx.jpg" oninput="galPreviewUrl()" style="width:100%">
+              </div>
+              <div id="galImgTabFile" class="img-tab-panel" style="display:none">
+                <div class="admin-img-upload" onclick="document.getElementById('galImageFile').click()">
+                  <input type="file" id="galImageFile" accept="image/*" style="display:none" onchange="galPreviewImage(this)">
+                  <div id="galImgPreview" class="admin-img-preview" style="min-height:180px">
+                    <span>+ Fotoğraf Yükle</span>
+                  </div>
                 </div>
+              </div>
+              <div id="galImgPreviewUrl" class="admin-url-preview" style="display:none">
+                <img id="galImgPreviewUrlImg" src="" alt="">
               </div>
             </div>
 

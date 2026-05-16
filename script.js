@@ -907,6 +907,23 @@ let adminEditingId  = null;
 let adminPendingImage = null;
 let _eventsCache = [];
 
+function switchImgTab(prefix, tab) {
+  const urlPanel  = document.getElementById(prefix + 'ImgTabUrl');
+  const filePanel = document.getElementById(prefix + 'ImgTabFile');
+  const tabs = (urlPanel || filePanel).closest('.admin-field').querySelectorAll('.img-tab');
+  tabs.forEach((btn, i) => btn.classList.toggle('active', (i === 0 && tab === 'url') || (i === 1 && tab === 'file')));
+  if (urlPanel)  urlPanel.style.display  = tab === 'url'  ? '' : 'none';
+  if (filePanel) filePanel.style.display = tab === 'file' ? '' : 'none';
+}
+
+function adminPreviewUrl(prefix) {
+  const url = document.getElementById(prefix === 'ev' ? 'evImageUrl' : 'galImageUrl').value.trim();
+  const wrap = document.getElementById(prefix + 'ImgPreviewUrl');
+  const img  = document.getElementById(prefix + 'ImgPreviewUrlImg');
+  if (url) { img.src = url; wrap.style.display = ''; if (prefix === 'ev') adminPendingImage = null; }
+  else     { wrap.style.display = 'none'; }
+}
+
 function adminPreviewImage(input) {
   if (!input.files || !input.files[0]) return;
   const reader = new FileReader();
@@ -914,6 +931,8 @@ function adminPreviewImage(input) {
     adminPendingImage = e.target.result;
     document.getElementById('evImgPreview').innerHTML =
       `<img src="${adminPendingImage}" alt="Önizleme">`;
+    document.getElementById('evImageUrl').value = '';
+    document.getElementById('evImgPreviewUrl').style.display = 'none';
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -937,7 +956,7 @@ async function adminSaveEvent() {
     desc:     document.getElementById('evDesc').value.trim(),
     content:  document.getElementById('evContent').value.trim(),
     featured: document.getElementById('evFeatured').checked,
-    image:    adminPendingImage || (adminEditingId ? (_eventsCache.find(e=>e.id===adminEditingId)||{}).image_url : null),
+    image:    document.getElementById('evImageUrl').value.trim() || adminPendingImage || (adminEditingId ? (_eventsCache.find(e=>e.id===adminEditingId)||{}).image_url : null),
   };
 
   try {
@@ -961,6 +980,8 @@ function adminClearForm() {
   document.getElementById('evFeatured').checked = false;
   document.getElementById('evImgPreview').innerHTML = '<span>+ Görsel Yükle</span>';
   document.getElementById('evImageFile').value = '';
+  document.getElementById('evImageUrl').value = '';
+  document.getElementById('evImgPreviewUrl').style.display = 'none';
   adminPendingImage = null;
   adminEditingId = null;
   document.getElementById('adminSaveBtn').textContent = 'ETKİNLİĞİ KAYDET';
@@ -979,13 +1000,20 @@ function adminEditEvent(id) {
   document.getElementById('evDesc').value       = ev.description || '';
   document.getElementById('evContent').value    = ev.content  || '';
   document.getElementById('evFeatured').checked = ev.featured || false;
-  const preview = document.getElementById('evImgPreview');
+  const urlInput = document.getElementById('evImageUrl');
+  const urlWrap  = document.getElementById('evImgPreviewUrl');
+  const urlImg   = document.getElementById('evImgPreviewUrlImg');
   if (ev.image_url) {
-    adminPendingImage = ev.image_url;
-    preview.innerHTML = `<img src="${ev.image_url}" alt="Önizleme">`;
-  } else {
+    urlInput.value = ev.image_url;
+    urlImg.src = ev.image_url;
+    urlWrap.style.display = '';
     adminPendingImage = null;
-    preview.innerHTML = '<span>+ Görsel Yükle</span>';
+    switchImgTab('ev', 'url');
+  } else {
+    urlInput.value = '';
+    urlWrap.style.display = 'none';
+    adminPendingImage = null;
+    document.getElementById('evImgPreview').innerHTML = '<span>+ Görsel Yükle</span>';
   }
   document.getElementById('adminSaveBtn').textContent = 'DEĞİŞİKLİKLERİ KAYDET';
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1101,6 +1129,14 @@ let _galleryCache = [];
 
 function galInitDefaults() { /* Supabase schema.sql'de yapılıyor */ }
 
+function galPreviewUrl() {
+  const url  = document.getElementById('galImageUrl').value.trim();
+  const wrap = document.getElementById('galImgPreviewUrl');
+  const img  = document.getElementById('galImgPreviewUrlImg');
+  if (url) { img.src = url; wrap.style.display = ''; galPendingImage = null; }
+  else     { wrap.style.display = 'none'; }
+}
+
 function galPreviewImage(input) {
   if (!input.files || !input.files[0]) return;
   const reader = new FileReader();
@@ -1108,18 +1144,24 @@ function galPreviewImage(input) {
     galPendingImage = e.target.result;
     document.getElementById('galImgPreview').innerHTML =
       `<img src="${galPendingImage}" style="width:100%;height:180px;object-fit:contain;background:#111">`;
+    document.getElementById('galImageUrl').value = '';
+    document.getElementById('galImgPreviewUrl').style.display = 'none';
   };
   reader.readAsDataURL(input.files[0]);
 }
 
 async function galSavePhoto() {
-  if (!galPendingImage) { alert('Lütfen bir fotoğraf seçin.'); return; }
+  const urlInput = document.getElementById('galImageUrl').value.trim();
+  const src = urlInput || galPendingImage;
+  if (!src) { alert('Lütfen bir görsel URL\'si girin veya dosya seçin.'); return; }
   const caption = document.getElementById('galCaption').value.trim();
   const large   = document.getElementById('galLarge').checked;
   try {
-    await sbAddPhoto({ src: galPendingImage, caption, large });
+    await sbAddPhoto({ src, caption, large });
     galPendingImage = null;
     document.getElementById('galImgPreview').innerHTML = '<span>+ Fotoğraf Yükle</span>';
+    document.getElementById('galImageUrl').value = '';
+    document.getElementById('galImgPreviewUrl').style.display = 'none';
     document.getElementById('galCaption').value = '';
     document.getElementById('galLarge').checked = false;
     document.getElementById('galImageFile').value = '';

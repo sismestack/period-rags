@@ -2174,6 +2174,33 @@ ul { list-style: none; }
 }
 .admin-checkbox-label input { width: auto; padding: 0; }
 
+.img-input-tabs { display: flex; gap: 6px; margin-bottom: 8px; }
+.img-tab {
+  flex: 1;
+  padding: 7px 10px;
+  font-family: var(--font-body);
+  font-size: 0.70rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--bg-input);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.img-tab.active { background: var(--red-dim); color: var(--text); border-color: var(--red); }
+.img-tab:hover:not(.active) { border-color: var(--text-dim); color: var(--text); }
+.img-tab-panel { margin-bottom: 6px; }
+.admin-url-preview {
+  margin-top: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.admin-url-preview img { width: 100%; max-height: 160px; object-fit: cover; display: block; }
+
 .admin-img-upload { cursor: pointer; }
 .admin-img-preview {
   border: 1px dashed var(--border);
