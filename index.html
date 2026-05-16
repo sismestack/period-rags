@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Period Rags — Live • Loud • Dirty</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Metal+Mania&family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700;900&family=Oswald:wght@300;400;500;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <nav id="navbar">
+    <div class="nav-logo" onclick="navigateTo('home')" title="Anasayfa">
+      <img src="./yeni logolar/logo2.png" alt="Period Rags">
+    </div>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Menü aç/kapat">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" class="nav-link active" data-page="home">Anasayfa</a></li>
+      <li><a href="#" class="nav-link" data-page="about">Hakkımızda</a></li>
+      <li><a href="#" class="nav-link" data-page="menu">Menü</a></li>
+      <li><a href="#" class="nav-link" data-page="events">Etkinlikler</a></li>
+      <li><a href="#" class="nav-link" data-page="gallery">Galeri</a></li>
+      <li><a href="#" class="nav-link" data-page="minigames">Mini Games</a></li>
+      <li><a href="#" class="nav-link" data-page="wheel">Period Çark</a></li>
+      <li><a href="#" class="nav-link" data-page="contact">İletişim</a></li>
+    </ul>
+    <div class="nav-auth" id="navAuth">
+      <div class="auth-guest" id="authGuest">
+        <button class="auth-btn-login" onclick="openAuthModal('login')">GİRİŞ YAP</button>
+      </div>
+      <div class="auth-user" id="authUser" style="display:none">
+        <button class="auth-btn-admin" id="adminNavBtn" onclick="navigateTo('admin')" style="display:none">⚙ ADMİN</button>
+        <span class="auth-username" id="authUsername"></span>
+        <button class="auth-btn-logout" onclick="logoutUser()">ÇIKIŞ</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===================== AUTH MODAL ===================== -->
+  <div class="auth-modal-overlay" id="authModalOverlay" onclick="closeAuthModal()">
+    <div class="auth-modal" onclick="event.stopPropagation()">
+      <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
+
+      <!-- Login Tab -->
+      <div class="auth-tab-content" id="authTabLogin">
+        <div class="auth-modal-header">
+          <h2 class="auth-modal-title">GİRİŞ YAP</h2>
+          <div class="auth-modal-line"></div>
+        </div>
+        <form class="auth-form" onsubmit="submitLogin(event)">
+          <div class="auth-field">
+            <label>KULLANICI ADI</label>
+            <input type="text" id="loginUsername" placeholder="Kullanıcı adın" autocomplete="username" required>
+          </div>
+          <div class="auth-field">
+            <label>ŞİFRE</label>
+            <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password" required>
+          </div>
+          <p class="auth-error" id="loginError"></p>
+          <button type="submit" class="auth-submit-btn">GİRİŞ YAP</button>
+        </form>
+        <p class="auth-switch">Hesabın yok mu? <span onclick="openAuthModal('register')">Kayıt ol</span></p>
+      </div>
+
+      <!-- Register Tab -->
+      <div class="auth-tab-content" id="authTabRegister" style="display:none">
+        <div class="auth-modal-header">
+          <h2 class="auth-modal-title">KAYIT OL</h2>
+          <div class="auth-modal-line"></div>
+        </div>
+        <form class="auth-form" onsubmit="submitRegister(event)">
+          <div class="auth-field">
+            <label>KULLANICI ADI</label>
+            <input type="text" id="registerUsername" placeholder="Bir kullanıcı adı seç" autocomplete="username" required>
+          </div>
+          <div class="auth-field">
+            <label>ŞİFRE</label>
+            <input type="password" id="registerPassword" placeholder="••••••••" autocomplete="new-password" required>
+          </div>
+          <div class="auth-field">
+            <label>ŞİFRE TEKRAR</label>
+            <input type="password" id="registerPasswordConfirm" placeholder="••••••••" autocomplete="new-password" required>
+          </div>
+          <p class="auth-error" id="registerError"></p>
+          <button type="submit" class="auth-submit-btn">KAYIT OL</button>
+        </form>
+        <p class="auth-switch">Zaten hesabın var mı? <span onclick="openAuthModal('login')">Giriş yap</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN ===================== -->
+  <main id="main">
+
+    <!-- ======================================== -->
+    <!-- PAGE: ANASAYFA                          -->
+    <!-- ======================================== -->
+    <section id="page-home" class="page active">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-bg" style="background-image: url('./iç mekan.png')"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-slogan-side">
+          <span class="slogan-word">LIVE</span>
+          <span class="slogan-dot">•</span>
+          <span class="slogan-word">LOUD</span>
+          <span class="slogan-dot">•</span>
+          <span class="slogan-word">DIRTY</span>
+        </div>
+        <div class="hero-content">
+          <img src="./yeni logolar/koca koca logo.png" alt="Period Rags" class="hero-logo">
+          <p class="hero-rock-label"><span class="line-dec"></span>ROCK N ROLL BAR<span class="line-dec"></span></p>
+          <p class="hero-location">HAWICK • LOS SANTOS</p>
+          <div class="hero-tagline-wrap">
+            <div class="hero-tagline-line"></div>
+            <p class="hero-tagline">LIVE LOUD. DRINK HARD. STAY WILD.</p>
+            <div class="hero-tagline-line"></div>
+          </div>
+          <div class="hero-btns">
+            <button class="btn-primary" onclick="navigateTo('menu')">Menüyü Gör</button>
+            <button class="btn-outline-hero" onclick="navigateTo('events')">Etkinlikleri İncele</button>
+          </div>
+        </div>
+        <div class="hero-right-deco">
+          <div class="hero-deco-line"></div>
+          <span class="hero-deco-icon">✦</span>
+          <div class="hero-deco-line"></div>
+        </div>
+      </div>
+
+      <!-- CARDS SECTION -->
+      <div class="section cards-section">
+        <div class="section-inner">
+          <div class="cards-grid">
+
+            <!-- MENU CARD -->
+            <div class="card" onclick="navigateTo('menu')">
+              <div class="card-img" style="background-image: url('./menü.png')">
+                <div class="card-img-overlay"></div>
+              </div>
+              <div class="card-body">
+                <div class="card-top-bar"></div>
+                <h3 class="card-title">MENÜ</h3>
+                <p class="card-desc">Özel kokteyller, sert içkiler ve dönem ruhu</p>
+                <button class="card-btn">MENÜYE GİT</button>
+              </div>
+            </div>
+
+            <!-- EVENTS CARD -->
+            <div class="card" onclick="navigateTo('events')">
+              <div class="card-img events-card-bg">
+                <div class="card-img-overlay"></div>
+                <div class="events-poster">
+                  <span class="events-poster-label">LIVE</span>
+                  <span class="events-poster-sub">MUSIC</span>
+                  <span class="events-poster-day">SATURDAY</span>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="card-top-bar"></div>
+                <h3 class="card-title">ETKİNLİKLER</h3>
+                <p class="card-desc">Canlı müzik, özel geceler ve bar etkinlikleri</p>
+                <button class="card-btn">ETKİNLİKLERİ GÖR</button>
+              </div>
+            </div>
+
+            <!-- GALLERY CARD -->
+            <div class="card" onclick="navigateTo('gallery')">
+              <div class="card-img gallery-card-bg">
+                <div class="gallery-mini-grid">
+                  <div class="gm-item" style="background-image: url('./iç mekan.png')"></div>
+                  <div class="gm-item" style="background-image: url('./dış mekan.png')"></div>
+                  <div class="gm-item" style="background-image: url('./tabela.png')"></div>
+                  <div class="gm-item" style="background-image: url('./dış mekan.png')"></div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="card-top-bar"></div>
+                <h3 class="card-title">GALERİ</h3>
+                <p class="card-desc">Fotoğraflar, anlar ve efsane geceler</p>
+                <button class="card-btn">GALERİYE GİT</button>
+              </div>
+            </div>
+
+            <!-- MINI GAMES CARD -->
+            <div class="card" onclick="navigateTo('minigames')">
+              <div class="card-img minigames-card-bg">
+                <div class="card-img-overlay dark-overlay"></div>
+                <img src="./period bird/Period Bird uçağı.png" alt="Period Bird" class="card-plane-img">
+              </div>
+              <div class="card-body">
+                <div class="card-top-bar"></div>
+                <h3 class="card-title">MINI GAMES</h3>
+                <p class="card-desc">Arkadaşlarınla yarış, rekoru kır</p>
+                <button class="card-btn">OYNA</button>
+              </div>
+            </div>
+
+            <!-- WHEEL CARD -->
+            <div class="card" onclick="navigateTo('wheel')">
+              <div class="card-img wheel-card-bg">
+                <div class="card-img-overlay dark-overlay"></div>
+                <div class="mini-wheel-preview">
+                  <div class="mini-wheel-ring">
+                    <div class="mini-wheel-center">
+                      <span>SPIN</span>
+                      <span>WIN</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="card-top-bar"></div>
+                <h3 class="card-title">PERIOD ÇARK</h3>
+                <p class="card-desc">Şansını dene ve ödülünü kazan</p>
+                <button class="card-btn">ÇARKI DÖNDÜR</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- HOME PREVIEWS -->
+      <div class="section home-previews-section">
+        <div class="section-inner">
+          <div class="previews-grid">
+
+            <!-- Signature Drinks -->
+            <div class="preview-col">
+              <div class="preview-header">
+                <div class="preview-line"></div>
+                <h3>İMZA KOKTEYLLERİ</h3>
+                <div class="preview-line"></div>
+              </div>
+              <div class="drinks-list">
+                <div class="drink-row featured-drink">
+                  <span class="drink-icon-glyph">◆</span>
+                  <div class="drink-info-col">
+                    <span class="drink-name">Adri Special</span>
+                    <span class="drink-desc-small">Özel tarif — bir kez iç, unutamazsın</span>
+                  </div>
+                  <span class="drink-price">$100</span>
+                </div>
+                <div class="drink-row featured-drink">
+                  <span class="drink-icon-glyph">◆</span>
+                  <div class="drink-info-col">
+                    <span class="drink-name">Tanışalım mı?</span>
+                    <span class="drink-desc-small">Period Rags'in davet kadehi</span>
+                  </div>
+                  <span class="drink-price">$70</span>
+                </div>
+                <div class="drink-row">
+                  <span class="drink-icon-glyph">◇</span>
+                  <div class="drink-info-col">
+                    <span class="drink-name">Dirty Hawick</span>
+                    <span class="drink-desc-small">Sokaklardan bir damla</span>
+                  </div>
+                  <span class="drink-price">$80</span>
+                </div>
+                <div class="drink-row">
+                  <span class="drink-icon-glyph">◇</span>
+                  <div class="drink-info-col">
+                    <span class="drink-name">Los Santos Nights</span>
+                    <span class="drink-desc-small">Gece hayatının özü</span>
+                  </div>
+                  <span class="drink-price">$75</span>
+                </div>
+              </div>
+              <button class="btn-outline-sm" onclick="navigateTo('menu')">TÜM MENÜYE GİT</button>
+            </div>
+
+            <!-- Upcoming Events -->
+            <div class="preview-col">
+              <div class="preview-header">
+                <div class="preview-line"></div>
+                <h3>YAKLAŞAN ETKİNLİKLER</h3>
+                <div class="preview-line"></div>
+              </div>
+              <div class="events-preview-list">
+                <div class="ev-prev-item">
+                  <div class="ev-prev-badge">♪</div>
+                  <div class="ev-prev-info">
+                    <span class="ev-prev-name">Live Music Night</span>
+                    <span class="ev-prev-when">Cuma · 21:00 · Hawick, Los Santos</span>
+                  </div>
+                  <span class="ev-prev-dot live-dot">●</span>
+                </div>
+                <div class="ev-prev-item">
+                  <div class="ev-prev-badge">⚡</div>
+                  <div class="ev-prev-info">
+                    <span class="ev-prev-name">Rock Night</span>
+                    <span class="ev-prev-when">Cumartesi · 22:00 · Hawick, Los Santos</span>
+                  </div>
+                  <span class="ev-prev-dot live-dot">●</span>
+                </div>
+                <div class="ev-prev-item">
+                  <div class="ev-prev-badge">🎤</div>
+                  <div class="ev-prev-info">
+                    <span class="ev-prev-name">Open Stage</span>
+                    <span class="ev-prev-when">Çarşamba · 20:00 · Hawick, Los Santos</span>
+                  </div>
+                  <span class="ev-prev-dot live-dot">●</span>
+                </div>
+              </div>
+              <button class="btn-outline-sm" onclick="navigateTo('events')">TÜM ETKİNLİKLERİ GÖR</button>
+            </div>
+
+            <!-- From the Gallery -->
+            <div class="preview-col">
+              <div class="preview-header">
+                <div class="preview-line"></div>
+                <h3>GALERİDEN</h3>
+                <div class="preview-line"></div>
+              </div>
+              <div class="gallery-preview-grid">
+                <div class="gp-item" style="background-image: url('./iç mekan.png')" onclick="openLightbox('./iç mekan.png')"></div>
+                <div class="gp-item" style="background-image: url('./dış mekan.png')" onclick="openLightbox('./dış mekan.png')"></div>
+                <div class="gp-item" style="background-image: url('./tabela.png')" onclick="openLightbox('./tabela.png')"></div>
+                <div class="gp-item" style="background-image: url('./büyük logo.png')" onclick="openLightbox('./büyük logo.png')"></div>
+              </div>
+              <button class="btn-outline-sm" onclick="navigateTo('gallery')">GALERİYE GİT</button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- CTA BANNER -->
+      <div class="cta-banner">
+        <div class="cta-bg" style="background-image: url('./dış mekan.png')"></div>
+        <div class="cta-overlay"></div>
+        <div class="cta-content">
+          <h2 class="cta-heading">HAWICK'İN KALBİNDE,<br>EFSANE DEVAM EDİYOR.</h2>
+          <button class="btn-primary" onclick="navigateTo('about')">DAHA FAZLA</button>
+        </div>
+        <div class="cta-logo-block">
+          <img src="./site logo.png" alt="Period Rags">
+          <div class="cta-logo-text">
+            <span>PERIOD RAGS</span>
+            <span>HAWICK • LOS SANTOS</span>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /page-home -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: HAKKIMIZDA                        -->
+    <!-- ======================================== -->
+    <section id="page-about" class="page">
+
+      <div class="page-header">
+        <div class="page-header-bg" style="background-image: url('./dış mekan.png')"></div>
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">HAKKIMIZDA</h1>
+          <div class="ph-line"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-inner">
+          <div class="about-grid">
+            <div class="about-text-col">
+              <div class="section-label">PERIOD RAGS</div>
+              <h2 class="section-heading">HAWICK'İN<br>KARANLIK KALBİ</h2>
+              <div class="red-rule"></div>
+              <p class="about-lead-text">Period Rags, Hawick'in karanlık sokaklarında kendi sesini bulan bir bar. Burada gürültü, müzik ve özgürlük aynı masada buluşur.</p>
+              <p class="about-body-text">Sert içkiler, canlı müzik ve kimliğini yaşayanlar için bir mekan. Sahnenin önünde ya da barda — Period Rags her gecey seni içine çeker.</p>
+              <p class="about-body-text">Hawick'in ruhunu taşı, Los Santos'un enerjisiyle yaşa. Adrian Locke'un kurduğu bu bar, şimdi de efsane olmaya devam ediyor.</p>
+              <div class="about-stats">
+                <div class="stat-item">
+                  <span class="stat-number">7/24</span>
+                  <span class="stat-label">Açık Kapı</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <span class="stat-number">100+</span>
+                  <span class="stat-label">İçecek Çeşidi</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                  <span class="stat-number">EST.</span>
+                  <span class="stat-label">2026</span>
+                </div>
+              </div>
+              <div class="about-owner-card">
+                <span class="aoc-label">OWNER</span>
+                <span class="aoc-name">Adrian Locke</span>
+                <span class="aoc-code">19-96</span>
+              </div>
+            </div>
+            <div class="about-images-col">
+              <div class="about-img-main" style="background-image: url('./iç mekan.png')"></div>
+              <div class="about-img-side" style="background-image: url('./dış mekan.png')"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section><!-- /page-about -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: MENÜ                              -->
+    <!-- ======================================== -->
+    <section id="page-menu" class="page">
+      <div class="menu-img-wrap">
+        <img src="./menü.png" alt="Period Rags Menü" class="menu-ref-img">
+      </div>
+    </section><!-- /page-menu -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: ETKİNLİKLER                       -->
+    <!-- ======================================== -->
+    <section id="page-events" class="page">
+
+      <div class="page-header events-page-header">
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">ETKİNLİKLER</h1>
+          <div class="ph-line"></div>
+          <p class="ph-sub">Hawick'te her gece bir efsane başlıyor</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-inner">
+          <div id="dynamicEventsGrid" class="events-grid"></div>
+          <div id="eventsEmptyMsg" class="events-empty" style="display:none">
+            <p>Henüz etkinlik eklenmedi.</p>
+          </div>
+        </div>
+      </div>
+    </section><!-- /page-events -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: GALERİ                            -->
+    <!-- ======================================== -->
+    <section id="page-gallery" class="page">
+
+      <div class="page-header">
+        <div class="page-header-bg" style="background-image: url('./iç mekan.png')"></div>
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">GALERİ</h1>
+          <div class="ph-line"></div>
+          <p class="ph-sub">Period Rags'ten kareler</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-inner">
+          <div id="dynamicGalleryGrid" class="gallery-grid"></div>
+        </div>
+      </div>
+    </section><!-- /page-gallery -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: MINI GAMES (PERIOD BIRD)          -->
+    <!-- ======================================== -->
+    <section id="page-minigames" class="page">
+
+      <div class="game-page-wrap">
+
+        <!-- GAME HEADER -->
+        <div class="game-header">
+          <div class="gh-left">
+            <div class="gh-location">
+              <span class="gh-loc-label">HAWICK</span>
+              <span class="gh-loc-sub">LOS SANTOS</span>
+            </div>
+          </div>
+          <div class="gh-center">
+            <div class="gh-title-row">
+              <div class="gh-wing-line"></div>
+              <h1 class="gh-title">✈ PERIOD BIRD ✈</h1>
+              <div class="gh-wing-line"></div>
+            </div>
+            <p class="gh-subtitle">FLY LOW. STAY ALIVE. SET THE HIGH SCORE.</p>
+          </div>
+          <div class="gh-right">
+            <div class="gh-scores">
+              <div class="gh-score-item">
+                <span class="gh-score-label">PUAN</span>
+                <span class="gh-score-val" id="currentScore">0</span>
+              </div>
+              <div class="gh-score-sep"></div>
+              <div class="gh-score-item">
+                <span class="gh-score-label">EN İYİ</span>
+                <span class="gh-score-val" id="bestScore">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GAME BODY -->
+        <div class="game-body">
+
+          <!-- LEFT PANEL -->
+          <div class="game-panel">
+
+            <div class="gp-section">
+              <div class="gp-section-title">
+                <div class="gp-line"></div>
+                <span>NASIL OYNANIR</span>
+                <div class="gp-line"></div>
+              </div>
+              <p class="gp-text">Period Bird uçağını boru engelleri arasından geçirerek ilerle. Ne kadar uzun uçarsan o kadar çok puan kazanırsın.</p>
+            </div>
+
+            <div class="gp-section">
+              <div class="gp-section-title">
+                <div class="gp-line"></div>
+                <span>KONTROLLER</span>
+                <div class="gp-line"></div>
+              </div>
+              <div class="controls-list">
+                <div class="ctrl-item"><span class="ctrl-key">SPACE</span><span class="ctrl-action">↑ Yukarı Uç</span></div>
+                <div class="ctrl-item"><span class="ctrl-key">CLICK</span><span class="ctrl-action">↑ Yukarı Uç</span></div>
+                <div class="ctrl-item"><span class="ctrl-key">TAP</span><span class="ctrl-action">↑ Yukarı Uç</span></div>
+                <div class="ctrl-item"><span class="ctrl-key">—</span><span class="ctrl-action">↓ Yerçekimi</span></div>
+              </div>
+            </div>
+
+            <div class="gp-section">
+              <div class="gp-section-title">
+                <div class="gp-line"></div>
+                <span>EN İYİ PİLOTLAR</span>
+                <div class="gp-line"></div>
+              </div>
+              <div class="leaderboard-list" id="leaderboardList">
+                <div class="lb-item lb-top"><span class="lb-rank">1.</span><span class="lb-name">HAWICK_JOE</span><span class="lb-score">12,840</span></div>
+                <div class="lb-item"><span class="lb-rank">2.</span><span class="lb-name">WINNER_76</span><span class="lb-score">8,410</span></div>
+                <div class="lb-item"><span class="lb-rank">3.</span><span class="lb-name">REBEL_JOE</span><span class="lb-score">6,200</span></div>
+                <div class="lb-item"><span class="lb-rank">4.</span><span class="lb-name">PERIOD_K</span><span class="lb-score">4,980</span></div>
+              </div>
+              <p class="lb-note">* En iyi skorun kaydedilmektedir</p>
+            </div>
+
+          </div><!-- /game-panel -->
+
+          <!-- CANVAS AREA -->
+          <div class="game-canvas-area">
+            <div class="canvas-wrap">
+              <canvas id="gameCanvas" width="1000" height="580"></canvas>
+            </div>
+            <div class="game-ctrl-row">
+              <button class="btn-game-start" id="startBtn" onclick="startPeriodBird()">▶ BAŞLAT</button>
+              <button class="btn-game-restart" id="restartBtn" onclick="restartPeriodBird()" style="display:none">↺ TEKRAR OYNA</button>
+            </div>
+          </div>
+
+        </div><!-- /game-body -->
+
+      </div><!-- /game-page-wrap -->
+    </section><!-- /page-minigames -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: PERIOD ÇARK                       -->
+    <!-- ======================================== -->
+    <section id="page-wheel" class="page">
+
+      <div class="page-header wheel-page-header">
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">PERIOD ÇARK</h1>
+          <div class="ph-line"></div>
+          <p class="ph-sub">Şansını dene — ödülün seni bekliyor</p>
+        </div>
+      </div>
+
+      <div class="section wheel-section">
+        <div class="section-inner">
+          <div class="wheel-layout">
+
+            <!-- PRIZES LIST -->
+            <div class="wheel-prizes-col">
+              <h3 class="prizes-heading">ÖDÜLLER</h3>
+              <div class="prizes-list">
+                <div class="prize-row" data-index="0"><span class="pr-icon">🍺</span><span class="pr-name">Ücretsiz İçki</span></div>
+                <div class="prize-row" data-index="1"><span class="pr-icon">%</span><span class="pr-name">%50 İndirim</span></div>
+                <div class="prize-row" data-index="2"><span class="pr-icon">?</span><span class="pr-name">Mystery Shot</span></div>
+                <div class="prize-row" data-index="3"><span class="pr-icon">★</span><span class="pr-name">Adri Special</span></div>
+                <div class="prize-row" data-index="4"><span class="pr-icon">↺</span><span class="pr-name">Tekrar Dene</span></div>
+                <div class="prize-row jackpot-row" data-index="5"><span class="pr-icon">💰</span><span class="pr-name">JACKPOT!</span></div>
+              </div>
+            </div>
+
+            <!-- WHEEL CENTER -->
+            <div class="wheel-center-col">
+              <div class="wheel-container">
+                <div class="wheel-pointer-wrap">
+                  <div class="wheel-pointer">▼</div>
+                </div>
+                <canvas id="wheelCanvas" width="460" height="460"></canvas>
+              </div>
+              <div class="wheel-result-box" id="wheelResultBox" style="display:none">
+                <span class="wrb-label">KAZANDIN</span>
+                <span class="wrb-value" id="wheelResultText">—</span>
+              </div>
+              <button class="btn-spin" id="spinBtn">
+                <span>ÇARKI DÖNDÜR</span>
+              </button>
+              <p class="wheel-hint">Barmenine göstererek ödülünü al</p>
+            </div>
+
+            <!-- HOW IT WORKS -->
+            <div class="wheel-rules-col">
+              <h3 class="prizes-heading">NASIL ÇALIŞIR</h3>
+              <div class="wheel-rules-list">
+                <div class="wr-item"><span class="wr-num">01</span><span class="wr-text">Çarkı bir kez döndürebilirsin</span></div>
+                <div class="wr-item"><span class="wr-num">02</span><span class="wr-text">Durduğu ödülü barmenine göster</span></div>
+                <div class="wr-item"><span class="wr-num">03</span><span class="wr-text">Jackpot kazanırsan bar seninle kutlar</span></div>
+                <div class="wr-item"><span class="wr-num">04</span><span class="wr-text">Tekrar Dene çıkarsa biraz sonra dene</span></div>
+              </div>
+              <div class="wheel-brand">
+                <img src="./site logo.png" alt="Period Rags">
+                <div class="wb-text">
+                  <span>PERIOD RAGS</span>
+                  <span>HAWICK • LOS SANTOS</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section><!-- /page-wheel -->
+
+
+    <!-- ======================================== -->
+    <!-- PAGE: İLETİŞİM                          -->
+    <!-- ======================================== -->
+    <section id="page-contact" class="page">
+
+      <div class="page-header">
+        <div class="page-header-bg" style="background-image: url('./dış mekan.png')"></div>
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">İLETİŞİM</h1>
+          <div class="ph-line"></div>
+        </div>
+      </div>
+
+      <div class="section contact-section">
+        <div class="section-inner">
+          <div class="contact-grid">
+            <div class="contact-info-col">
+              <h3 class="contact-heading">BULMAK</h3>
+              <div class="contact-item">
+                <span class="ci-icon">📍</span>
+                <div class="ci-text">
+                  <span class="ci-label">KONUM</span>
+                  <span class="ci-val">Hawick, Los Santos</span>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">👤</span>
+                <div class="ci-text">
+                  <span class="ci-label">OWNER</span>
+                  <span class="ci-val">Adrian Locke — 19-96</span>
+                </div>
+              </div>
+              <div class="contact-item">
+                <span class="ci-icon">🕐</span>
+                <div class="ci-text">
+                  <span class="ci-label">AÇILIŞ SAATLERİ</span>
+                  <span class="ci-val">Pzt–Per: 18:00 – 02:00</span>
+                  <span class="ci-val">Cum–Paz: 18:00 – 04:00</span>
+                </div>
+              </div>
+            </div>
+            <div class="contact-logo-col">
+              <img src="./büyük logo.png" alt="Period Rags" class="contact-logo-img">
+              <p class="contact-slogan">LIVE • LOUD • DIRTY</p>
+              <p class="contact-est">EST. 2026 — HAWICK, LOS SANTOS</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section><!-- /page-contact -->
+
+    <!-- ======================================== -->
+    <!-- PAGE: ADMİN PANELİ                      -->
+    <!-- ======================================== -->
+    <section id="page-admin" class="page">
+      <div class="admin-wrap">
+        <div class="admin-header">
+          <h1 class="admin-title">⚙ ADMİN PANELİ</h1>
+          <p class="admin-sub">Period Rags — Yönetim Ekranı</p>
+        </div>
+
+        <!-- Tab butonları -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-tab="events" onclick="adminSwitchTab('events')">ETKİNLİKLER</button>
+          <button class="admin-tab" data-tab="gallery" onclick="adminSwitchTab('gallery')">GALERİ</button>
+        </div>
+
+        <!-- ETKİNLİKLER TAB -->
+        <div id="adminTabEvents" class="admin-body">
+          <!-- Sol: Form -->
+          <div class="admin-form-col">
+            <h2 class="admin-section-title">Yeni Etkinlik Ekle</h2>
+            <form class="admin-event-form" onsubmit="return false">
+
+              <div class="admin-field">
+                <label>ETKİNLİK BAŞLIĞI *</label>
+                <input type="text" id="evTitle" placeholder="Etkinlik adı">
+              </div>
+
+              <div class="admin-field-row">
+                <div class="admin-field">
+                  <label>TÜR / ETİKET</label>
+                  <input type="text" id="evType" placeholder="örn. ⚡ ROCK GECESİ">
+                </div>
+                <div class="admin-field">
+                  <label>COVER ÜCRETİ</label>
+                  <input type="text" id="evCover" placeholder="örn. $50 veya ÜCRETSİZ">
+                </div>
+              </div>
+
+              <div class="admin-field-row">
+                <div class="admin-field">
+                  <label>TARİH</label>
+                  <input type="date" id="evDate">
+                </div>
+                <div class="admin-field">
+                  <label>SAAT</label>
+                  <input type="text" id="evTime" placeholder="örn. 21:00 – 02:00">
+                </div>
+              </div>
+
+              <div class="admin-field">
+                <label>KONUM</label>
+                <input type="text" id="evLocation" placeholder="örn. Hawick, Los Santos" value="Hawick, Los Santos">
+              </div>
+
+              <div class="admin-field">
+                <label>KISA AÇIKLAMA</label>
+                <textarea id="evDesc" rows="2" placeholder="Kart üzerinde görünecek kısa açıklama"></textarea>
+              </div>
+
+              <div class="admin-field">
+                <label>DETAYLI İÇERİK</label>
+                <textarea id="evContent" rows="6" placeholder="Tıklandığında açılacak tam içerik..."></textarea>
+              </div>
+
+              <div class="admin-field">
+                <label>AFİŞ / GÖRSEL</label>
+                <div class="admin-img-upload" onclick="document.getElementById('evImageFile').click()">
+                  <input type="file" id="evImageFile" accept="image/*" style="display:none" onchange="adminPreviewImage(this)">
+                  <div id="evImgPreview" class="admin-img-preview">
+                    <span>+ Görsel Yükle</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="admin-field-row">
+                <label class="admin-checkbox-label">
+                  <input type="checkbox" id="evFeatured"> ÖNE ÇIKAN ETKİNLİK
+                </label>
+              </div>
+
+              <div class="admin-form-actions">
+                <button type="button" class="admin-btn-cancel" onclick="adminClearForm()">TEMİZLE</button>
+                <button type="button" class="admin-btn-save" id="adminSaveBtn" onclick="adminSaveEvent()">ETKİNLİĞİ KAYDET</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Sağ: Mevcut etkinlikler -->
+          <div class="admin-list-col">
+            <h2 class="admin-section-title">Eklenen Etkinlikler</h2>
+            <div id="adminEventList" class="admin-event-list">
+              <p class="admin-empty-note">Henüz etkinlik eklenmedi.</p>
+            </div>
+          </div>
+        </div><!-- /adminTabEvents -->
+
+        <!-- GALERİ TAB -->
+        <div id="adminTabGallery" class="admin-body" style="display:none">
+          <!-- Sol: Yükleme formu -->
+          <div class="admin-form-col">
+            <h2 class="admin-section-title">Yeni Fotoğraf Ekle</h2>
+
+            <div class="admin-field">
+              <label>FOTOĞRAF SEÇ</label>
+              <div class="admin-img-upload" onclick="document.getElementById('galImageFile').click()">
+                <input type="file" id="galImageFile" accept="image/*" style="display:none" onchange="galPreviewImage(this)">
+                <div id="galImgPreview" class="admin-img-preview" style="min-height:180px">
+                  <span>+ Fotoğraf Yükle</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="admin-field">
+              <label>AÇIKLAMA (isteğe bağlı)</label>
+              <input type="text" id="galCaption" placeholder="Fotoğraf başlığı veya açıklama">
+            </div>
+
+            <div class="admin-field-row">
+              <label class="admin-checkbox-label">
+                <input type="checkbox" id="galLarge"> GENİŞ GÖSTER (2 sütun)
+              </label>
+            </div>
+
+            <div class="admin-form-actions">
+              <button type="button" class="admin-btn-save" onclick="galSavePhoto()" style="flex:1">FOTOĞRAFI EKLE</button>
+            </div>
+          </div>
+
+          <!-- Sağ: Mevcut fotoğraflar -->
+          <div class="admin-list-col">
+            <h2 class="admin-section-title">Galerideki Fotoğraflar</h2>
+            <div id="adminGalleryList" class="admin-gallery-list"></div>
+          </div>
+        </div><!-- /adminTabGallery -->
+
+      </div><!-- /admin-wrap -->
+    </section><!-- /page-admin -->
+
+  </main><!-- /main -->
+
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer id="footer">
+    <div class="footer-top-rule"></div>
+    <div class="footer-inner">
+      <div class="footer-col">
+        <span class="ft-label">BULMAK</span>
+        <span class="ft-val">Hawick</span>
+        <span class="ft-val">Los Santos</span>
+        <span class="ft-val ft-owner">Adrian Locke — 19-96</span>
+      </div>
+      <div class="footer-col footer-center-col">
+        <img src="./site logo.png" alt="Period Rags" class="footer-logo">
+        <span class="footer-brand-name">PERIOD RAGS</span>
+        <span class="footer-slogan">LIVE • LOUD • DIRTY</span>
+        <div class="footer-center-line"></div>
+        <span class="footer-sub">ROCK N ROLL BAR</span>
+      </div>
+      <div class="footer-col footer-right-col">
+        <span class="ft-label">AÇILIŞ</span>
+        <span class="ft-val">Pzt – Per: 18:00 – 02:00</span>
+        <span class="ft-val">Cum – Cmt: 18:00 – 04:00</span>
+        <span class="ft-val">Paz: 18:00 – 03:00</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 PERIOD RAGS. ALL RIGHTS RESERVED.</span>
+      <span class="footer-bottom-sep">|</span>
+      <span>LIVE LOUD. DRINK HARD. STAY WILD.</span>
+    </div>
+  </footer>
+
+  <!-- ===================== EVENT DETAIL MODAL ===================== -->
+  <div class="event-detail-overlay" id="eventDetailOverlay" onclick="closeEventDetail()">
+    <div class="event-detail-modal" onclick="event.stopPropagation()">
+      <button class="event-detail-close" onclick="closeEventDetail()">✕</button>
+      <div id="eventDetailImg" class="event-detail-img" style="display:none">
+        <img id="eventDetailImgEl" src="" alt="">
+      </div>
+      <div class="event-detail-body">
+        <div class="event-detail-meta" id="eventDetailMeta"></div>
+        <h2 class="event-detail-title" id="eventDetailTitle"></h2>
+        <div class="event-detail-info" id="eventDetailInfo"></div>
+        <div class="event-detail-content" id="eventDetailContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== LIGHTBOX ===================== -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+    <button class="lb-close" onclick="closeLightbox()">✕</button>
+    <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="./supabase.js"></script>
+  <script src="./script.js"></script>
+</body>
+</html>
