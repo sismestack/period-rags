@@ -1794,32 +1794,17 @@ ul { list-style: none; }
    CONTACT
    ============================================================ */
 .contact-section { padding: 64px 0 80px; }
-.contact-grid {
-  display: grid;
-  grid-template-columns: 1fr 2px 1fr;
-  gap: 60px;
+.contact-card-wrap {
+  display: flex;
+  justify-content: center;
   align-items: center;
 }
-.contact-divider-v { background: var(--border); align-self: stretch; }
-.contact-heading {
-  font-family: var(--font-head);
-  font-size: 0.80rem;
-  letter-spacing: 0.22em;
-  color: var(--red);
-  margin-bottom: 24px;
-  text-transform: uppercase;
+.contact-card-img {
+  width: min(720px, 100%);
+  border-radius: 18px;
+  box-shadow: 0 12px 60px rgba(0,0,0,0.7), 0 0 40px rgba(201,162,39,0.12);
+  display: block;
 }
-.contact-info-col { display: flex; flex-direction: column; gap: 16px; }
-.contact-item { display: flex; align-items: flex-start; gap: 14px; }
-.ci-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
-.ci-text { display: flex; flex-direction: column; gap: 3px; }
-.ci-label { font-size: 0.60rem; letter-spacing: 0.22em; color: var(--red); font-weight: 700; text-transform: uppercase; }
-.ci-val { font-size: 0.88rem; color: var(--text-dim); }
-
-.contact-logo-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
-.contact-logo-img { width: min(280px, 80%); filter: drop-shadow(0 8px 20px rgba(204,0,0,0.3)); mix-blend-mode: screen; background: transparent; }
-.contact-slogan { font-family: var(--font-head); font-size: 1rem; letter-spacing: 0.22em; color: var(--text); }
-.contact-est { font-size: 0.65rem; letter-spacing: 0.20em; color: var(--gold-text); }
 
 /* ============================================================
    FOOTER
@@ -1977,9 +1962,7 @@ ul { list-style: none; }
   .game-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; padding: 16px; gap: 16px; }
   .gp-section { flex: 1; min-width: 200px; }
 
-  .contact-grid { grid-template-columns: 1fr; gap: 32px; }
-  .contact-divider-v { display: none; }
-  .contact-logo-col { border-top: 1px solid var(--border); padding-top: 32px; }
+  .contact-card-img { width: 100%; }
 
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-right-col { grid-column: span 2; align-items: flex-start; text-align: left; }
