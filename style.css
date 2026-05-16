@@ -2507,20 +2507,6 @@ ul { list-style: none; }
   pointer-events: none;
 }
 
-/* Köşe süslemeleri */
-.splash-corner {
-  position: absolute;
-  width: 60px;
-  height: 60px;
-  border-color: rgba(204,0,0,0.25);
-  border-style: solid;
-  pointer-events: none;
-}
-.splash-corner-tl { top: 24px; left: 24px;  border-width: 1px 0 0 1px; }
-.splash-corner-tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
-.splash-corner-bl { bottom: 24px; left: 24px;  border-width: 0 0 1px 1px; }
-.splash-corner-br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
-
 /* İçerik */
 .splash-content {
   position: relative;
@@ -2531,24 +2517,12 @@ ul { list-style: none; }
   gap: 28px;
 }
 
-/* Logo wrapper — vignette ile gri arkaplanı maskeler */
-.splash-logo-wrap {
-  position: relative;
-  display: inline-block;
-}
 .splash-logo {
-  width: min(620px, 80vw);
+  width: min(640px, 82vw);
   display: block;
+  mix-blend-mode: screen;
   animation: splashFloat 4.5s ease-in-out infinite;
   transition: transform 0.5s ease, filter 0.5s ease;
-}
-/* Kenarlara siyah vignette — gri arkaplanı siyahla karıştırır */
-.splash-logo-vignette {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 85% 80% at 50% 50%, transparent 38%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 88%);
-  pointer-events: none;
 }
 
 @keyframes splashFloat {
