@@ -712,6 +712,7 @@
         <div class="admin-tabs">
           <button class="admin-tab active" data-tab="events" onclick="adminSwitchTab('events')">ETKİNLİKLER</button>
           <button class="admin-tab" data-tab="gallery" onclick="adminSwitchTab('gallery')">GALERİ</button>
+          <button class="admin-tab" data-tab="users" onclick="adminSwitchTab('users')">KULLANICILAR</button>
         </div>
 
         <!-- ETKİNLİKLER TAB -->
@@ -794,6 +795,16 @@
             </div>
           </div>
         </div><!-- /adminTabEvents -->
+
+        <!-- KULLANICILAR TAB -->
+        <div id="adminTabUsers" class="admin-body admin-body-full" style="display:none">
+          <div class="admin-users-col">
+            <h2 class="admin-section-title">Kayıtlı Kullanıcılar</h2>
+            <div id="adminUserList" class="admin-user-list">
+              <p class="admin-empty-note">Yükleniyor...</p>
+            </div>
+          </div>
+        </div>
 
         <!-- GALERİ TAB -->
         <div id="adminTabGallery" class="admin-body" style="display:none">

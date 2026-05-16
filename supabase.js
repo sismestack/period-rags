@@ -98,3 +98,17 @@ async function sbTogglePhotoLarge(id, large) {
   const { error } = await _sb.from('gallery').update({ large }).eq('id', id);
   if (error) throw error;
 }
+
+/* ============================================================
+   KULLANICI YÖNETİMİ
+   ============================================================ */
+async function sbGetUsers() {
+  const { data, error } = await _sb.from('profiles').select('id, username, is_admin, created_at').order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+async function sbSetAdmin(username, is_admin) {
+  const { error } = await _sb.from('profiles').update({ is_admin }).eq('username', username);
+  if (error) throw error;
+}

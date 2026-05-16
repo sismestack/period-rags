@@ -1141,10 +1141,12 @@ function closeEventDetail() {
 function adminSwitchTab(tab) {
   document.getElementById('adminTabEvents').style.display  = tab === 'events'  ? '' : 'none';
   document.getElementById('adminTabGallery').style.display = tab === 'gallery' ? '' : 'none';
+  document.getElementById('adminTabUsers').style.display   = tab === 'users'   ? '' : 'none';
   document.querySelectorAll('.admin-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
   if (tab === 'gallery') adminRenderGalleryList();
+  if (tab === 'users') adminRenderUserList();
 }
 
 /* ============================================================
@@ -1216,6 +1218,46 @@ async function adminRenderGalleryList() {
       </div>
     </div>
   `).join('');
+}
+
+/* ============================================================
+   KULLANICI YÖNETİMİ — Admin Panel
+   ============================================================ */
+async function adminRenderUserList() {
+  const list = document.getElementById('adminUserList');
+  if (!list) return;
+  list.innerHTML = '<p class="admin-empty-note">Yükleniyor...</p>';
+  try {
+    const users = await sbGetUsers();
+    if (!users.length) { list.innerHTML = '<p class="admin-empty-note">Henüz kayıtlı kullanıcı yok.</p>'; return; }
+    list.innerHTML = users.map(u => `
+      <div class="admin-user-item ${u.is_admin ? 'is-admin' : ''}">
+        <div class="admin-user-info">
+          <span class="admin-user-name">${u.username}</span>
+          <span class="admin-user-badge ${u.is_admin ? 'badge-admin' : 'badge-user'}">${u.is_admin ? 'ADMİN' : 'KULLANICI'}</span>
+        </div>
+        <div class="admin-user-actions">
+          ${u.username !== 'simse'
+            ? u.is_admin
+              ? `<button class="admin-user-demote" onclick="adminToggleUserAdmin('${u.username}', true)">YETKİYİ AL</button>`
+              : `<button class="admin-user-promote" onclick="adminToggleUserAdmin('${u.username}', false)">ADMİN YAP</button>`
+            : '<span class="admin-user-owner">OWNER</span>'
+          }
+        </div>
+      </div>
+    `).join('');
+  } catch(err) {
+    list.innerHTML = `<p class="admin-empty-note">Hata: ${err.message}</p>`;
+  }
+}
+
+async function adminToggleUserAdmin(username, currentIsAdmin) {
+  const action = currentIsAdmin ? 'YETKİYİ AL' : 'ADMİN YAP';
+  if (!confirm(`"${username}" kullanıcısını ${action} yapmak istediğine emin misin?`)) return;
+  try {
+    await sbSetAdmin(username, !currentIsAdmin);
+    await adminRenderUserList();
+  } catch(err) { alert('Hata: ' + err.message); }
 }
 
 async function renderGallery() {
