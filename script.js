@@ -961,6 +961,7 @@ async function adminSaveEvent() {
 
   try {
     await sbSaveEvent(ev);
+    localStorage.removeItem('eventsCache');
     adminClearForm();
     await adminRenderList();
     await renderDynamicEvents();
@@ -1023,6 +1024,7 @@ async function adminDeleteEvent(id) {
   if (!confirm('Bu etkinliği silmek istediğine emin misin?')) return;
   try {
     await sbDeleteEvent(id);
+    localStorage.removeItem('eventsCache');
     await adminRenderList();
     await renderDynamicEvents();
   } catch(err) { alert('Silme hatası: ' + err.message); }
@@ -1052,12 +1054,10 @@ async function adminRenderList() {
   `).join('');
 }
 
-async function renderDynamicEvents() {
+function _renderEventsGrid(events) {
   const grid = document.getElementById('dynamicEventsGrid');
-  if (!grid) return;
-  const events = await sbGetEvents();
-  _eventsCache = events;
   const emptyMsg = document.getElementById('eventsEmptyMsg');
+  if (!grid) return;
   if (!events.length) {
     grid.innerHTML = '';
     if (emptyMsg) emptyMsg.style.display = '';
@@ -1082,6 +1082,19 @@ async function renderDynamicEvents() {
       </div>
     </div>
   `).join('');
+}
+
+async function renderDynamicEvents() {
+  // Önce cache'den göster
+  try {
+    const cached = JSON.parse(localStorage.getItem('eventsCache') || '[]');
+    if (cached.length) { _eventsCache = cached; _renderEventsGrid(cached); }
+  } catch {}
+  // Arka planda tazesini çek ve güncelle
+  const events = await sbGetEvents();
+  _eventsCache = events;
+  try { localStorage.setItem('eventsCache', JSON.stringify(events)); } catch {}
+  _renderEventsGrid(events);
 }
 
 function openEventDetail(id) {
@@ -1255,15 +1268,13 @@ async function adminToggleUserAdmin(username, currentIsAdmin) {
 /* ============================================================
    ANA SAYFA — MİNİ ETKİNLİK KARTI
    ============================================================ */
-async function renderHomeEvents() {
+function _renderHomeEventsMini(events) {
   const wrap = document.getElementById('homeEventsMini');
   if (!wrap) return;
-  const events = await sbGetEvents();
   if (!events.length) {
     wrap.innerHTML = '<p style="font-size:0.75rem;color:var(--text-faint);letter-spacing:0.08em">Henüz etkinlik eklenmedi.</p>';
     return;
   }
-  // En fazla 3 etkinlik göster
   wrap.innerHTML = events.slice(0, 3).map(ev => `
     <div class="home-ev-mini-card" onclick="navigateTo('events')">
       <div class="home-ev-mini-img" style="background-image:url('${ev.image_url || ''}')">
@@ -1276,6 +1287,18 @@ async function renderHomeEvents() {
       </div>
     </div>
   `).join('');
+}
+
+async function renderHomeEvents() {
+  // Önce cache'den göster
+  try {
+    const cached = JSON.parse(localStorage.getItem('eventsCache') || '[]');
+    if (cached.length) _renderHomeEventsMini(cached);
+  } catch {}
+  // Arka planda güncelle (renderDynamicEvents zaten çekiyor, cache paylaşılıyor)
+  const events = await sbGetEvents();
+  try { localStorage.setItem('eventsCache', JSON.stringify(events)); } catch {}
+  _renderHomeEventsMini(events);
 }
 
 async function renderGallery() {
