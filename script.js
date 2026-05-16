@@ -1246,7 +1246,7 @@ async function adminRenderUserList() {
           <span class="admin-user-badge ${u.is_admin ? 'badge-admin' : 'badge-user'}">${u.is_admin ? 'ADMİN' : 'KULLANICI'}</span>
         </div>
         <div class="admin-user-actions">
-          ${u.username !== 'simse'
+          ${u.username !== 'AstorSoren'
             ? u.is_admin
               ? `<button class="admin-user-demote" onclick="adminToggleUserAdmin('${u.username}', true)">YETKİYİ AL</button>`
               : `<button class="admin-user-promote" onclick="adminToggleUserAdmin('${u.username}', false)">ADMİN YAP</button>`

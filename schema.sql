@@ -53,7 +53,7 @@ create policy "Public all gallery"   on gallery for all using (true);
 
 -- Admin hesabını ekle (şifre: 123456 → SHA-256 hash)
 insert into profiles (username, password_hash, is_admin)
-values ('simse', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', true)
+values ('AstorSoren', '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92', true)
 on conflict (username) do nothing;
 
 -- Varsayılan galeri görselleri
