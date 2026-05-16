@@ -1,3 +1,4 @@
 {
+  "alias": ["period-rags.vercel.app"],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
