@@ -47,6 +47,7 @@ function navigateTo(pageId) {
   // Page-specific init
   if (pageId === 'minigames') {
     requestAnimationFrame(() => initPeriodBird());
+    loadLeaderboard();
   }
   if (pageId === 'wheel') {
     requestAnimationFrame(() => initWheel());
@@ -530,7 +531,12 @@ class PeriodBirdGame {
     const restartBtn = document.getElementById('restartBtn');
     if (restartBtn) restartBtn.style.display = 'inline-flex';
 
-    this._updateLeaderboard();
+    // Supabase'e skor kaydet (giriş yapılmışsa)
+    if (_currentUser && this.score > 0) {
+      sbSaveScore(_currentUser.username, this.score)
+        .then(() => loadLeaderboard())
+        .catch(() => {});
+    }
   }
 
   _checkBestScore() {
@@ -549,22 +555,6 @@ class PeriodBirdGame {
     if (bs) bs.textContent = this.bestScore;
   }
 
-  _updateLeaderboard() {
-    // Update local best in leaderboard if it beats placeholder 4th entry
-    if (this.score > 0) {
-      const lb = document.getElementById('leaderboardList');
-      if (!lb) return;
-      const items = lb.querySelectorAll('.lb-item');
-      const lastItem = items[items.length - 1];
-      if (lastItem) {
-        const lastScore = parseInt(lastItem.querySelector('.lb-score')?.textContent.replace(',', '') || '0');
-        if (this.score > lastScore) {
-          lastItem.querySelector('.lb-name').textContent = 'TU';
-          lastItem.querySelector('.lb-score').textContent = this.score.toLocaleString();
-        }
-      }
-    }
-  }
 
   restart() {
     // Önceki loop'u kesin durdur
@@ -621,8 +611,25 @@ function restartPeriodBird() {
   if (birdGame) birdGame.restart();
 }
 
-function viewFullLeaderboard() {
-  alert('Skor tablosu yakında aktif edilecek!\nŞu anki en iyi puan: ' + (birdGame ? birdGame.bestScore : localStorage.getItem('periodBirdBest') || 0));
+async function loadLeaderboard() {
+  const lb = document.getElementById('leaderboardList');
+  if (!lb) return;
+  try {
+    const scores = await sbGetLeaderboard();
+    if (!scores.length) {
+      lb.innerHTML = '<p class="lb-note" style="color:var(--text-dim)">Henüz skor yok. İlk sen ol!</p>';
+      return;
+    }
+    lb.innerHTML = scores.map((s, i) => `
+      <div class="lb-item ${i === 0 ? 'lb-top' : ''}">
+        <span class="lb-rank">${i + 1}.</span>
+        <span class="lb-name">${s.username.toUpperCase()}</span>
+        <span class="lb-score">${Number(s.score).toLocaleString()}</span>
+      </div>
+    `).join('');
+  } catch(e) {
+    lb.innerHTML = '<p class="lb-note" style="color:var(--text-dim)">Yüklenemedi.</p>';
+  }
 }
 
 /* ============================================================

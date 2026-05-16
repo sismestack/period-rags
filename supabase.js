@@ -112,3 +112,25 @@ async function sbSetAdmin(username, is_admin) {
   const { error } = await _sb.from('profiles').update({ is_admin }).eq('username', username);
   if (error) throw error;
 }
+
+/* ============================================================
+   SKOR TABLOSU
+   ============================================================ */
+async function sbGetLeaderboard() {
+  const { data, error } = await _sb.from('scores')
+    .select('username, score')
+    .order('score', { ascending: false })
+    .limit(10);
+  if (error) throw error;
+  return data || [];
+}
+
+async function sbSaveScore(username, score) {
+  const { data: existing } = await _sb.from('scores')
+    .select('score').eq('username', username).single();
+  if (!existing || score > existing.score) {
+    const { error } = await _sb.from('scores')
+      .upsert({ username, score, updated_at: new Date().toISOString() }, { onConflict: 'username' });
+    if (error) throw error;
+  }
+}
