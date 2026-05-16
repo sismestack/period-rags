@@ -745,18 +745,60 @@ function spinWheel() {
 }
 
 /* ============================================================
+   SPLASH / GİRİŞ EKRANI
+   ============================================================ */
+function initSplash() {
+  const splash = document.getElementById('splashScreen');
+  if (!splash) return;
+
+  let done = false;
+
+  function doExit() {
+    if (done) return;
+    done = true;
+
+    // Hemen basın yazısını söndür
+    const press = document.getElementById('splashPress');
+    const divider = splash.querySelector('.splash-divider');
+    if (press)   { press.style.animation = 'none'; press.style.opacity = '0'; press.style.transition = 'opacity 0.15s'; }
+    if (divider) { divider.style.opacity = '0'; divider.style.transition = 'opacity 0.15s'; }
+
+    // Kısa gecikme: logo alevlenir, sonra ekran kararır
+    setTimeout(() => {
+      splash.classList.add('splash-exit');
+    }, 180);
+
+    // DOM'dan kaldır
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 1100);
+
+    document.removeEventListener('keydown', doExit);
+    splash.removeEventListener('click', doExit);
+    splash.removeEventListener('touchstart', doExit);
+  }
+
+  document.addEventListener('keydown', doExit);
+  splash.addEventListener('click', doExit);
+  splash.addEventListener('touchstart', doExit, { passive: true });
+}
+
+/* ============================================================
    STARTUP
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-  // Load best score display
+  // Splash ekranı başlat
+  initSplash();
+
+  // En iyi skor göster
   const best = localStorage.getItem('periodBirdBest');
   if (best) {
     const el = document.getElementById('bestScore');
     if (el) el.textContent = best;
   }
-  // Restore auth session
+  // Oturum geri yükle
   authInit();
-  // Render any saved events & gallery from Supabase
+  // Etkinlik ve galeriyi yükle
   renderDynamicEvents();
   renderGallery();
 });

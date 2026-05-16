@@ -2463,3 +2463,154 @@ ul { list-style: none; }
   font-family: var(--font-body);
   opacity: 0.7;
 }
+
+/* ============================================================
+   SPLASH / GİRİŞ EKRANI
+   ============================================================ */
+#splashScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+}
+
+/* Ortadan yayılan kırmızı ışıma */
+.splash-bg-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 65% 55% at 50% 52%,
+    rgba(80,0,0,0.55) 0%,
+    rgba(30,0,0,0.25) 45%,
+    transparent 70%);
+  animation: splashGlowPulse 3.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+@keyframes splashGlowPulse {
+  from { opacity: 0.7; transform: scale(1); }
+  to   { opacity: 1;   transform: scale(1.06); }
+}
+
+/* Alttan kızıl kor parıltısı */
+.splash-bottom-glow {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(to top, rgba(120,0,0,0.18) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Köşe süslemeleri */
+.splash-corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-color: rgba(204,0,0,0.25);
+  border-style: solid;
+  pointer-events: none;
+}
+.splash-corner-tl { top: 24px; left: 24px;  border-width: 1px 0 0 1px; }
+.splash-corner-tr { top: 24px; right: 24px; border-width: 1px 1px 0 0; }
+.splash-corner-bl { bottom: 24px; left: 24px;  border-width: 0 0 1px 1px; }
+.splash-corner-br { bottom: 24px; right: 24px; border-width: 0 1px 1px 0; }
+
+/* İçerik */
+.splash-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+}
+
+/* Logo wrapper — vignette ile gri arkaplanı maskeler */
+.splash-logo-wrap {
+  position: relative;
+  display: inline-block;
+}
+.splash-logo {
+  width: min(620px, 80vw);
+  display: block;
+  animation: splashFloat 4.5s ease-in-out infinite;
+  transition: transform 0.5s ease, filter 0.5s ease;
+}
+/* Kenarlara siyah vignette — gri arkaplanı siyahla karıştırır */
+.splash-logo-vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 85% 80% at 50% 50%, transparent 38%, rgba(0,0,0,0.55) 65%, rgba(0,0,0,0.97) 88%);
+  pointer-events: none;
+}
+
+@keyframes splashFloat {
+  0%,100% { transform: translateY(0px);  }
+  50%      { transform: translateY(-9px); }
+}
+
+/* Ayırıcı çizgi + ikon */
+.splash-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.splash-div-line {
+  display: block;
+  width: 90px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(204,0,0,0.45));
+}
+.splash-div-line:last-child {
+  background: linear-gradient(270deg, transparent, rgba(204,0,0,0.45));
+}
+.splash-div-icon {
+  font-size: 1rem;
+  color: rgba(204,0,0,0.55);
+  line-height: 1;
+}
+
+/* Basın yazısı */
+.splash-press {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.48em;
+  color: rgba(204,0,0,0.8);
+  text-transform: uppercase;
+  animation: splashPressPulse 2s ease-in-out infinite;
+}
+@keyframes splashPressPulse {
+  0%,100% { opacity: 0.25; }
+  50%      { opacity: 1; text-shadow: 0 0 18px rgba(204,0,0,0.7); }
+}
+
+/* ---- Çıkış animasyonu ---- */
+#splashScreen.splash-exit {
+  animation: splashScreenExit 0.9s ease-in forwards;
+  pointer-events: none;
+}
+@keyframes splashScreenExit {
+  0%   { opacity: 1; }
+  25%  { opacity: 1; background: #1a0000; }
+  100% { opacity: 0; }
+}
+#splashScreen.splash-exit .splash-logo {
+  animation: splashLogoFlare 0.6s ease-out forwards !important;
+}
+@keyframes splashLogoFlare {
+  0%   { transform: scale(1);    filter: drop-shadow(0 0 20px rgba(204,0,0,0.4)); }
+  40%  { transform: scale(1.10); filter: drop-shadow(0 0 70px rgba(204,0,0,0.95)) drop-shadow(0 0 120px rgba(140,0,0,0.6)); }
+  100% { transform: scale(1.18); filter: drop-shadow(0 0 100px rgba(204,0,0,0.3)); opacity: 0; }
+}
+#splashScreen.splash-exit .splash-press,
+#splashScreen.splash-exit .splash-divider {
+  opacity: 0 !important;
+  transition: opacity 0.15s ease;
+}
