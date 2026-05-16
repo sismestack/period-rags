@@ -1588,6 +1588,7 @@ ul { list-style: none; }
   border-radius: 2px;
   white-space: nowrap;
 }
+.rarity-easy     { color: #55dd55; background: rgba(30,120,30,0.18); border: 1px solid rgba(50,180,50,0.3); }
 .rarity-common   { color: #44cc44; background: rgba(40,120,40,0.18); border: 1px solid rgba(40,180,40,0.3); }
 .rarity-hard     { color: #cc8800; background: rgba(120,80,0,0.18);  border: 1px solid rgba(180,120,0,0.3); }
 .rarity-vhard    { color: #cc4400; background: rgba(120,40,0,0.18);  border: 1px solid rgba(180,60,0,0.3); }
@@ -1676,6 +1677,11 @@ ul { list-style: none; }
   position: absolute;
   inset: 0;
   background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+  pointer-events: none;
+}
+.btn-spin span {
+  position: relative;
+  z-index: 1;
 }
 .btn-spin:hover:not(:disabled) {
   background: var(--red-bright);
