@@ -645,15 +645,18 @@ class PeriodWheel {
     // 0=Tanışalım mı Kokteyl (22.5°), 1=Bira (67.5°), 2=5.000$ (112.5°),
     // 3=%50 İndirim (157.5°), 4=Bedava Bira (202.5°), 5=Premium Viski (247.5°),
     // 6=Büyük Ödül Nightblade (292.5°), 7=Adri Special (337.5°)
+    // Dilimler çarrk.png'deki saat yönü sırasına göre (her biri 45°, merkez i*45+22.5°):
+    // 0=Nightblade(22.5°) 1=Adri Special(67.5°) 2=Tanışalım mı?(112.5°) 3=Bira(157.5°)
+    // 4=$5000(202.5°) 5=%50 İndirim(247.5°) 6=Bedava İçki(292.5°) 7=İstediğin Bir Kokteyl(337.5°)
     this.prizes = [
-      { label: 'Tanışalım mı Kokteyl',  weight: 3,     icon: '🍹', rarity: 'ÇOK ZOR'              },
-      { label: 'Bira',                  weight: 14.99, icon: '🍺', rarity: ''                      },
-      { label: '5.000$',               weight: 0.01,  icon: '💵', rarity: 'NEREDEYSE İMKANSIZ'    },
-      { label: '%50 İndirim',           weight: 47,    icon: '%',  rarity: 'EN ÇOK ÇIKAN'          },
-      { label: 'Bedava Bira',           weight: 22,    icon: '🍺', rarity: ''                      },
-      { label: 'Premium Viski',         weight: 10,    icon: '🥃', rarity: 'ZOR'                   },
-      { label: 'Büyük Ödül Nightblade', weight: 0,     icon: '🏍', rarity: 'İMKANSIZ'             },
-      { label: 'Adri Special',          weight: 3,     icon: '⭐', rarity: 'AŞIRI ZOR'             },
+      { label: 'Büyük Ödül Nightblade', weight: 0,     icon: '🏍', rarity: 'İMKANSIZ'           },
+      { label: 'Adri Special',          weight: 3,     icon: '⭐', rarity: 'AŞIRI ZOR'            },
+      { label: 'Tanışalım mı?',         weight: 3,     icon: '🍹', rarity: 'ZOR'                  },
+      { label: 'Bira',                  weight: 14.99, icon: '🍺', rarity: ''                     },
+      { label: '5.000$',               weight: 0.01,  icon: '💵', rarity: 'NEREDEYSE İMKANSIZ'   },
+      { label: '%50 İndirim',           weight: 47,    icon: '%',  rarity: 'EN ÇOK ÇIKAN'         },
+      { label: 'Bedava İçki',           weight: 22,    icon: '🥃', rarity: ''                     },
+      { label: 'İstediğin Bir Kokteyl', weight: 10,    icon: '🍹', rarity: 'ZOR'                  },
     ];
 
     this.numPrizes  = this.prizes.length; // 8

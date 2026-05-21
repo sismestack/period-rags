@@ -195,9 +195,14 @@ async function sbVerifySpin(code) {
 
 async function sbLookupSpin(query) {
   const q = query.trim();
-  const { data: byCode } = await _sb.from('wheel_spins')
-    .select('*').eq('code', q.toUpperCase()).maybeSingle();
-  if (byCode) return byCode;
+  const upper = q.toUpperCase();
+  // Kod araması: PR- prefix yoksa otomatik ekle, her iki şekli de dene
+  const codesToTry = upper.startsWith('PR-') ? [upper] : ['PR-' + upper, upper];
+  for (const code of codesToTry) {
+    const { data } = await _sb.from('wheel_spins').select('*').eq('code', code).maybeSingle();
+    if (data) return data;
+  }
+  // Kullanıcı adı ile ara
   const { data: byUser } = await _sb.from('wheel_spins')
     .select('*').eq('username', q).eq('verified', false)
     .order('spun_at', { ascending: false }).limit(1).maybeSingle();
