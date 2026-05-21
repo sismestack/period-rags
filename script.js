@@ -845,20 +845,30 @@ async function spinWheel() {
 
   wheelGame.spinAsync(async (winner) => {
     if (!_currentUser) return;
+    // Popup'ı hemen aç, kod yüklenirken "..." göster
+    showPrizeCodePopup(winner, null);
     try {
       const spinData = await sbSaveWheelSpin(_currentUser.username, winner.label);
-      showPrizeCodePopup(winner, spinData.code);
+      const codeEl  = document.getElementById('prizePopupCode');
+      const copyBtn = document.getElementById('prizePopupCopyBtn');
+      const hintEl  = document.getElementById('prizePopupHint');
+      if (codeEl)  { codeEl.textContent = spinData.code; codeEl.classList.remove('code-loading'); }
+      if (copyBtn) copyBtn.style.display = '';
+      if (hintEl)  hintEl.style.display = '';
       if (statusEl) {
         statusEl.style.display = 'block';
         statusEl.className = 'wheel-status-msg wheel-status-ok';
         statusEl.textContent = `Tebrikler! Ödülün: ${winner.label}`;
       }
     } catch(err) {
-      if (statusEl) {
-        statusEl.style.display = 'block';
-        statusEl.className = 'wheel-status-msg wheel-status-warn';
-        statusEl.textContent = 'Ödül kaydedilemedi: ' + err.message;
-      }
+      const codeEl  = document.getElementById('prizePopupCode');
+      const hintEl  = document.getElementById('prizePopupHint');
+      const errNote = document.getElementById('prizePopupErrNote');
+      if (codeEl)  { codeEl.textContent = 'HATA'; codeEl.classList.remove('code-loading'); }
+      if (hintEl)  hintEl.style.display = 'none';
+      if (errNote) { errNote.style.display = ''; errNote.textContent = 'Kod kaydedilemedi: ' + err.message; }
+      const sb = document.getElementById('spinBtn');
+      if (sb) sb.disabled = false;
     }
   });
 }
@@ -867,11 +877,19 @@ async function spinWheel() {
    PRIZE CODE POPUP
    ============================================================ */
 function showPrizeCodePopup(winner, code) {
-  const icons = { '🍹':true, '🍺':true, '💵':true, '🥃':true, '🏍':true, '⭐':true, '%':true };
   document.getElementById('prizePopupIcon').textContent = winner.icon || '🎉';
   document.getElementById('prizePopupName').textContent = winner.label;
-  document.getElementById('prizePopupCode').textContent = code;
-  document.getElementById('prizePopupCopyBtn').textContent = '📋';
+  const codeEl  = document.getElementById('prizePopupCode');
+  const copyBtn = document.getElementById('prizePopupCopyBtn');
+  const hintEl  = document.getElementById('prizePopupHint');
+  const errNote = document.getElementById('prizePopupErrNote');
+  if (codeEl)  {
+    codeEl.textContent = code || 'Kaydediliyor...';
+    codeEl.classList.toggle('code-loading', !code);
+  }
+  if (copyBtn) { copyBtn.textContent = '📋'; copyBtn.style.display = code ? '' : 'none'; }
+  if (hintEl)  hintEl.style.display = code ? '' : 'none';
+  if (errNote) { errNote.style.display = 'none'; errNote.textContent = ''; }
   document.getElementById('prizePopupOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }

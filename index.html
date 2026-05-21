@@ -919,9 +919,14 @@
   </div>
 
   <!-- ===================== PRIZE CODE POPUP ===================== -->
-  <div class="prize-popup-overlay" id="prizePopupOverlay">
+  <div class="prize-popup-overlay" id="prizePopupOverlay" onclick="closePrizePopup()">
     <div class="prize-popup" onclick="event.stopPropagation()">
       <div class="prize-popup-glow"></div>
+      <div class="prize-popup-sparks">
+        <span class="spark s1"></span><span class="spark s2"></span>
+        <span class="spark s3"></span><span class="spark s4"></span>
+        <span class="spark s5"></span><span class="spark s6"></span>
+      </div>
       <div class="prize-popup-header">
         <div class="pp-line"></div>
         <span class="pp-title">KAZANDIN!</span>
@@ -935,7 +940,8 @@
           <span class="prize-popup-code" id="prizePopupCode">PR-XXXXXXXX</span>
           <button class="prize-popup-copy-btn" onclick="copyPrizeCode()" id="prizePopupCopyBtn" title="Kopyala">&#128203;</button>
         </div>
-        <p class="prize-popup-code-hint">Barmenine bu kodu göster · <span onclick="navigateTo('myprizes'); closePrizePopup()" class="pp-link">Ödüllerimde gör</span></p>
+        <p class="prize-popup-code-hint" id="prizePopupHint">Barmenine bu kodu göster · <span onclick="navigateTo('myprizes'); closePrizePopup()" class="pp-link">Ödüllerimde gör</span></p>
+        <p class="prize-popup-err-note" id="prizePopupErrNote" style="display:none"></p>
       </div>
       <button class="prize-popup-close-btn" onclick="closePrizePopup()">TAMAM</button>
     </div>
