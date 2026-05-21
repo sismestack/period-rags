@@ -43,6 +43,7 @@
       <li><a href="#" class="nav-link" data-page="minigames">Mini Games</a></li>
       <li><a href="#" class="nav-link" data-page="wheel">Period Çark</a></li>
       <li><a href="#" class="nav-link" data-page="contact">İletişim</a></li>
+      <li id="navMyPrizes" style="display:none"><a href="#" class="nav-link nav-link-prizes" data-page="myprizes">★ Ödüllerim</a></li>
     </ul>
     <div class="nav-auth" id="navAuth">
       <div class="auth-guest" id="authGuest">
@@ -578,9 +579,10 @@
                   <div class="wheel-pointer">▼</div>
                 </div>
                 <div class="wheel-img-container" id="wheelImgContainer">
-                  <img src="./yeni logolar/çark.png" id="wheelImg" alt="Period Çark" draggable="false">
+                  <img src="./yeni logolar/çarrk.png" id="wheelImg" alt="Period Çark" draggable="false">
                 </div>
               </div>
+              <div id="wheelStatusMsg" class="wheel-status-msg" style="display:none"></div>
               <div class="wheel-result-box" id="wheelResultBox" style="display:none">
                 <span class="wrb-label">KAZANDIN</span>
                 <span class="wrb-value" id="wheelResultText">—</span>
@@ -588,7 +590,7 @@
               <button class="btn-spin" id="spinBtn" onclick="spinWheel()">
                 <span>ÇARKI DÖNDÜR</span>
               </button>
-              <p class="wheel-hint">Barmenine göstererek ödülünü al</p>
+              <p class="wheel-hint">Haftada bir kez çevirebilirsin · Giriş gerekli</p>
             </div>
 
             <!-- HOW IT WORKS -->
@@ -652,6 +654,7 @@
           <button class="admin-tab active" data-tab="events" onclick="adminSwitchTab('events')">ETKİNLİKLER</button>
           <button class="admin-tab" data-tab="gallery" onclick="adminSwitchTab('gallery')">GALERİ</button>
           <button class="admin-tab" data-tab="users" onclick="adminSwitchTab('users')">KULLANICILAR</button>
+          <button class="admin-tab" data-tab="kodlar" onclick="adminSwitchTab('kodlar')">KODLAR</button>
         </div>
 
         <!-- ETKİNLİKLER TAB -->
@@ -808,8 +811,56 @@
           </div>
         </div><!-- /adminTabGallery -->
 
+        <!-- KODLAR TAB -->
+        <div id="adminTabKodlar" class="admin-body admin-body-full" style="display:none">
+          <div class="admin-kodlar-verify">
+            <h2 class="admin-section-title">Kod Sorgula &amp; Teyit Et</h2>
+            <div class="admin-verify-row">
+              <input type="text" id="adminVerifyInput" placeholder="Kod (PR-XXXXXXXX) veya kullanıcı adı">
+              <button class="admin-btn-save" onclick="adminLookupCode()">SORGULA</button>
+            </div>
+            <div id="adminVerifyResult" class="admin-verify-result"></div>
+          </div>
+          <div class="admin-kodlar-grid">
+            <div class="admin-kodlar-col">
+              <h2 class="admin-section-title">Bekleyen Ödüller</h2>
+              <div id="adminSpinsPending" class="admin-spins-list"><p class="admin-empty-note">Yükleniyor...</p></div>
+            </div>
+            <div class="admin-kodlar-col">
+              <h2 class="admin-section-title">Onaylanan Ödüller</h2>
+              <div id="adminSpinsVerified" class="admin-spins-list"><p class="admin-empty-note">Yükleniyor...</p></div>
+            </div>
+          </div>
+        </div>
+
       </div><!-- /admin-wrap -->
     </section><!-- /page-admin -->
+
+    <!-- ======================================== -->
+    <!-- PAGE: ÖDÜLLERİM                         -->
+    <!-- ======================================== -->
+    <section id="page-myprizes" class="page">
+      <div class="page-header">
+        <div class="page-header-bg" style="background-image: url('./dış mekan.png')"></div>
+        <div class="page-header-overlay"></div>
+        <div class="page-header-content">
+          <div class="ph-line"></div>
+          <h1 class="ph-title">ÖDÜLLERİM</h1>
+          <div class="ph-line"></div>
+          <p class="ph-sub">Kazandığın ödüller ve kodların</p>
+        </div>
+      </div>
+      <div class="section">
+        <div class="section-inner">
+          <div class="myprizes-tab-row">
+            <button class="myprizes-tab active" data-tab="active" onclick="switchMyPrizesTab('active')">AKTİF KODLAR</button>
+            <button class="myprizes-tab" data-tab="used" onclick="switchMyPrizesTab('used')">ESKİ ÖDÜLLERİM</button>
+          </div>
+          <div id="myPrizesActive" class="myprizes-list"></div>
+          <div id="myPrizesUsed" class="myprizes-list" style="display:none"></div>
+        </div>
+      </div>
+    </section>
 
   </main><!-- /main -->
 
@@ -865,6 +916,29 @@
   <div id="lightbox" class="lightbox" onclick="closeLightbox()">
     <button class="lb-close" onclick="closeLightbox()">✕</button>
     <img id="lightboxImg" src="" alt="">
+  </div>
+
+  <!-- ===================== PRIZE CODE POPUP ===================== -->
+  <div class="prize-popup-overlay" id="prizePopupOverlay">
+    <div class="prize-popup" onclick="event.stopPropagation()">
+      <div class="prize-popup-glow"></div>
+      <div class="prize-popup-header">
+        <div class="pp-line"></div>
+        <span class="pp-title">KAZANDIN!</span>
+        <div class="pp-line"></div>
+      </div>
+      <div class="prize-popup-icon" id="prizePopupIcon">🎉</div>
+      <div class="prize-popup-name" id="prizePopupName">—</div>
+      <div class="prize-popup-code-wrap">
+        <p class="prize-popup-code-label">KODUN</p>
+        <div class="prize-popup-code-row">
+          <span class="prize-popup-code" id="prizePopupCode">PR-XXXXXXXX</span>
+          <button class="prize-popup-copy-btn" onclick="copyPrizeCode()" id="prizePopupCopyBtn" title="Kopyala">&#128203;</button>
+        </div>
+        <p class="prize-popup-code-hint">Barmenine bu kodu göster · <span onclick="navigateTo('myprizes'); closePrizePopup()" class="pp-link">Ödüllerimde gör</span></p>
+      </div>
+      <button class="prize-popup-close-btn" onclick="closePrizePopup()">TAMAM</button>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

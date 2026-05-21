@@ -139,3 +139,67 @@ async function sbSaveScore(username, score) {
     if (error) throw error;
   }
 }
+
+/* ============================================================
+   ÇARK — SPIN KODLARI
+   ============================================================ */
+async function sbCheckWeeklySpin(username) {
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await _sb.from('wheel_spins')
+    .select('id, spun_at, prize, code')
+    .eq('username', username)
+    .gte('spun_at', weekAgo)
+    .order('spun_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return data || null;
+}
+
+function _genSpinCode() {
+  return 'PR-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+}
+
+async function sbSaveWheelSpin(username, prize) {
+  for (let i = 0; i < 5; i++) {
+    const code = _genSpinCode();
+    const { data, error } = await _sb.from('wheel_spins')
+      .insert({ username, prize, code })
+      .select().single();
+    if (!error) return data;
+    if (error.code !== '23505') throw error;
+  }
+  throw new Error('Kod üretme başarısız, tekrar dene.');
+}
+
+async function sbGetAllSpins() {
+  const { data, error } = await _sb.from('wheel_spins')
+    .select('*').order('spun_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+async function sbGetUserSpins(username) {
+  const { data, error } = await _sb.from('wheel_spins')
+    .select('*').eq('username', username).order('spun_at', { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+async function sbVerifySpin(code) {
+  const { data, error } = await _sb.from('wheel_spins')
+    .update({ verified: true, verified_at: new Date().toISOString() })
+    .eq('code', code.toUpperCase()).select().single();
+  if (error) throw error;
+  return data;
+}
+
+async function sbLookupSpin(query) {
+  const q = query.trim();
+  const { data: byCode } = await _sb.from('wheel_spins')
+    .select('*').eq('code', q.toUpperCase()).maybeSingle();
+  if (byCode) return byCode;
+  const { data: byUser } = await _sb.from('wheel_spins')
+    .select('*').eq('username', q).eq('verified', false)
+    .order('spun_at', { ascending: false }).limit(1).maybeSingle();
+  return byUser || null;
+}

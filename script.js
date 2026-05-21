@@ -55,6 +55,9 @@ function navigateTo(pageId) {
   if (pageId === 'admin') {
     adminRenderList();
   }
+  if (pageId === 'myprizes') {
+    loadMyPrizes();
+  }
   if (pageId === 'events') {
     renderDynamicEvents();
   }
@@ -714,7 +717,7 @@ class PeriodWheel {
     }, duration + 80);
   }
 
-  _onSpinEnd(spinBtn, resultBox, winnerIndex) {
+  _onSpinEnd(spinBtn, resultBox, winnerIndex, onSaved) {
     const winner = this.prizes[winnerIndex];
 
     if (resultBox) {
@@ -731,17 +734,318 @@ class PeriodWheel {
       }
     });
 
+    if (onSaved) onSaved(winner);
     if (spinBtn) setTimeout(() => { spinBtn.disabled = false; }, 3000);
+  }
+
+  spinAsync(onSaved) {
+    if (this.spinning || !this.container) return;
+    this.spinning = true;
+
+    const spinBtn = document.getElementById('spinBtn');
+    const resultBox = document.getElementById('wheelResultBox');
+    if (spinBtn) spinBtn.disabled = true;
+    if (resultBox) resultBox.style.display = 'none';
+
+    document.querySelectorAll('.prize-row').forEach(row => {
+      row.style.borderLeftColor = '';
+      row.style.background = '';
+    });
+
+    const winnerIndex = this._pickWinner();
+
+    const winnerCenter  = winnerIndex * this.sliceAngle + this.sliceAngle / 2;
+    const targetBase    = (360 - winnerCenter + 360) % 360;
+    const currentMod    = ((this.currentRotation % 360) + 360) % 360;
+    let delta           = (targetBase - currentMod + 360) % 360;
+    if (delta < 1) delta += 360;
+
+    const extraSpins    = 5 + Math.floor(Math.random() * 4);
+    const finalRotation = this.currentRotation + extraSpins * 360 + delta;
+    const duration      = 4500 + Math.random() * 1500;
+
+    this.container.style.transition = `transform ${duration}ms cubic-bezier(0.17,0.67,0.12,0.99)`;
+    this.container.style.transform  = `rotate(${finalRotation}deg)`;
+    this.currentRotation = finalRotation;
+
+    setTimeout(() => {
+      this.spinning = false;
+      this.container.style.transition = 'none';
+      this._onSpinEnd(spinBtn, resultBox, winnerIndex, onSaved);
+    }, duration + 80);
   }
 }
 
 function initWheel() {
   if (!wheelGame) wheelGame = new PeriodWheel();
+  _refreshWheelStatus();
 }
 
-function spinWheel() {
+async function _refreshWheelStatus() {
+  const statusEl = document.getElementById('wheelStatusMsg');
+  const spinBtn  = document.getElementById('spinBtn');
+  if (!statusEl || !spinBtn) return;
+
+  if (!_currentUser) {
+    statusEl.style.display = 'block';
+    statusEl.className = 'wheel-status-msg wheel-status-warn';
+    statusEl.textContent = 'Çarkı döndürmek için giriş yapman gerekiyor.';
+    spinBtn.disabled = true;
+    return;
+  }
+
+  try {
+    const existing = await sbCheckWeeklySpin(_currentUser.username);
+    if (existing) {
+      const d = new Date(existing.spun_at);
+      const nextSpin = new Date(d.getTime() + 7 * 24 * 60 * 60 * 1000);
+      const diff = nextSpin - Date.now();
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      statusEl.style.display = 'block';
+      statusEl.className = 'wheel-status-msg wheel-status-warn';
+      statusEl.textContent = `Bu hafta çevirmişsin. ${days} gün sonra tekrar deneyebilirsin.`;
+      spinBtn.disabled = true;
+    } else {
+      statusEl.style.display = 'none';
+      spinBtn.disabled = false;
+    }
+  } catch {
+    statusEl.style.display = 'none';
+    spinBtn.disabled = false;
+  }
+}
+
+async function spinWheel() {
   if (!wheelGame) wheelGame = new PeriodWheel();
-  wheelGame.spin();
+
+  const statusEl = document.getElementById('wheelStatusMsg');
+  const spinBtn  = document.getElementById('spinBtn');
+
+  if (!_currentUser) {
+    openAuthModal('login');
+    return;
+  }
+
+  if (spinBtn) spinBtn.disabled = true;
+
+  try {
+    const existing = await sbCheckWeeklySpin(_currentUser.username);
+    if (existing) {
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.className = 'wheel-status-msg wheel-status-warn';
+        const d = new Date(existing.spun_at);
+        const nextSpin = new Date(d.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const days = Math.ceil((nextSpin - Date.now()) / (1000 * 60 * 60 * 24));
+        statusEl.textContent = `Bu hafta çevirmişsin. ${days} gün sonra tekrar deneyebilirsin.`;
+      }
+      return;
+    }
+  } catch { /* izin ver */ }
+
+  wheelGame.spinAsync(async (winner) => {
+    if (!_currentUser) return;
+    try {
+      const spinData = await sbSaveWheelSpin(_currentUser.username, winner.label);
+      showPrizeCodePopup(winner, spinData.code);
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.className = 'wheel-status-msg wheel-status-ok';
+        statusEl.textContent = `Tebrikler! Ödülün: ${winner.label}`;
+      }
+    } catch(err) {
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.className = 'wheel-status-msg wheel-status-warn';
+        statusEl.textContent = 'Ödül kaydedilemedi: ' + err.message;
+      }
+    }
+  });
+}
+
+/* ============================================================
+   PRIZE CODE POPUP
+   ============================================================ */
+function showPrizeCodePopup(winner, code) {
+  const icons = { '🍹':true, '🍺':true, '💵':true, '🥃':true, '🏍':true, '⭐':true, '%':true };
+  document.getElementById('prizePopupIcon').textContent = winner.icon || '🎉';
+  document.getElementById('prizePopupName').textContent = winner.label;
+  document.getElementById('prizePopupCode').textContent = code;
+  document.getElementById('prizePopupCopyBtn').textContent = '📋';
+  document.getElementById('prizePopupOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePrizePopup() {
+  document.getElementById('prizePopupOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function copyPrizeCode() {
+  const code = document.getElementById('prizePopupCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.getElementById('prizePopupCopyBtn');
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = '📋', 1800);
+  }).catch(() => {
+    const range = document.createRange();
+    range.selectNode(document.getElementById('prizePopupCode'));
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+  });
+}
+
+/* ============================================================
+   ÖDÜLLERİM SAYFASI
+   ============================================================ */
+async function loadMyPrizes() {
+  if (!_currentUser) {
+    document.getElementById('myPrizesActive').innerHTML =
+      '<p class="admin-empty-note">Ödüllerini görmek için giriş yapman gerekiyor.</p>';
+    document.getElementById('myPrizesUsed').innerHTML = '';
+    return;
+  }
+  document.getElementById('myPrizesActive').innerHTML = '<p class="admin-empty-note">Yükleniyor...</p>';
+  try {
+    const spins = await sbGetUserSpins(_currentUser.username);
+    const active = spins.filter(s => !s.verified);
+    const used   = spins.filter(s => s.verified);
+    _renderMyPrizesList('myPrizesActive', active, false);
+    _renderMyPrizesList('myPrizesUsed',   used,   true);
+  } catch(err) {
+    document.getElementById('myPrizesActive').innerHTML =
+      `<p class="admin-empty-note">Yüklenemedi: ${err.message}</p>`;
+  }
+}
+
+function _renderMyPrizesList(containerId, spins, isUsed) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!spins.length) {
+    el.innerHTML = `<p class="admin-empty-note">${isUsed ? 'Henüz kullanılan ödül yok.' : 'Aktif kodun yok.'}</p>`;
+    return;
+  }
+  el.innerHTML = spins.map(s => {
+    const date = new Date(s.spun_at).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+    return `
+      <div class="myprize-card ${isUsed ? 'myprize-used' : ''}">
+        <div class="myprize-info">
+          <span class="myprize-name">${s.prize}</span>
+          <span class="myprize-date">${date}</span>
+          ${isUsed ? '<span class="myprize-verified-badge">✓ KULLANILDI</span>' : ''}
+        </div>
+        <div class="myprize-code-row">
+          <span class="myprize-code">${s.code}</span>
+          ${!isUsed ? `<button class="myprize-copy-btn" onclick="copyText('${s.code}', this)">📋</button>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓';
+    setTimeout(() => btn.textContent = '📋', 1800);
+  }).catch(() => {});
+}
+
+function switchMyPrizesTab(tab) {
+  document.querySelectorAll('.myprizes-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === tab);
+  });
+  document.getElementById('myPrizesActive').style.display = tab === 'active' ? '' : 'none';
+  document.getElementById('myPrizesUsed').style.display   = tab === 'used'   ? '' : 'none';
+}
+
+/* ============================================================
+   ADMIN — KODLAR TAB
+   ============================================================ */
+async function loadAdminKodlar() {
+  const pendingEl  = document.getElementById('adminSpinsPending');
+  const verifiedEl = document.getElementById('adminSpinsVerified');
+  if (!pendingEl || !verifiedEl) return;
+  pendingEl.innerHTML  = '<p class="admin-empty-note">Yükleniyor...</p>';
+  verifiedEl.innerHTML = '<p class="admin-empty-note">Yükleniyor...</p>';
+  try {
+    const all = await sbGetAllSpins();
+    const pending  = all.filter(s => !s.verified);
+    const verified = all.filter(s =>  s.verified);
+    _renderAdminSpins(pendingEl,  pending,  false);
+    _renderAdminSpins(verifiedEl, verified, true);
+  } catch(err) {
+    pendingEl.innerHTML = `<p class="admin-empty-note">Hata: ${err.message}</p>`;
+  }
+}
+
+function _renderAdminSpins(el, spins, isVerified) {
+  if (!spins.length) {
+    el.innerHTML = `<p class="admin-empty-note">${isVerified ? 'Onaylanan ödül yok.' : 'Bekleyen ödül yok.'}</p>`;
+    return;
+  }
+  el.innerHTML = spins.map(s => {
+    const date = new Date(s.spun_at).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+    const verDate = s.verified_at ? new Date(s.verified_at).toLocaleDateString('tr-TR', { day:'numeric', month:'long' }) : '';
+    return `
+      <div class="admin-spin-item ${isVerified ? 'spin-verified' : ''}">
+        <div class="admin-spin-info">
+          <span class="admin-spin-user">${s.username}</span>
+          <span class="admin-spin-prize">${s.prize}</span>
+          <span class="admin-spin-date">${date}</span>
+          ${isVerified ? `<span class="admin-spin-vdate">✓ ${verDate}</span>` : ''}
+        </div>
+        <div class="admin-spin-code">${s.code}</div>
+        ${!isVerified
+          ? `<button class="admin-btn-verify" onclick="adminVerifyCode('${s.code}')">ONAYLA</button>`
+          : ''}
+      </div>`;
+  }).join('');
+}
+
+let _adminFoundSpin = null;
+
+async function adminLookupCode() {
+  const q = document.getElementById('adminVerifyInput').value.trim();
+  const resultEl = document.getElementById('adminVerifyResult');
+  if (!q) return;
+  resultEl.innerHTML = '<p class="admin-empty-note">Aranıyor...</p>';
+  _adminFoundSpin = null;
+  try {
+    const spin = await sbLookupSpin(q);
+    if (!spin) {
+      resultEl.innerHTML = '<p class="admin-empty-note" style="color:var(--red)">Kod veya kullanıcı bulunamadı.</p>';
+      return;
+    }
+    _adminFoundSpin = spin;
+    const date = new Date(spin.spun_at).toLocaleDateString('tr-TR', { day:'numeric', month:'long', year:'numeric' });
+    resultEl.innerHTML = `
+      <div class="admin-lookup-result ${spin.verified ? 'lookup-verified' : ''}">
+        <div class="alr-row"><span class="alr-label">Kullanıcı</span><span class="alr-val">${spin.username}</span></div>
+        <div class="alr-row"><span class="alr-label">Ödül</span><span class="alr-val">${spin.prize}</span></div>
+        <div class="alr-row"><span class="alr-label">Kod</span><span class="alr-val code-mono">${spin.code}</span></div>
+        <div class="alr-row"><span class="alr-label">Tarih</span><span class="alr-val">${date}</span></div>
+        <div class="alr-row"><span class="alr-label">Durum</span><span class="alr-val ${spin.verified ? 'status-ok' : 'status-pend'}">${spin.verified ? '✓ ONAYLANDI' : '⏳ BEKLİYOR'}</span></div>
+        ${!spin.verified ? `<button class="admin-btn-verify alr-btn" onclick="adminVerifyFoundCode()">KODU ONAYLA</button>` : ''}
+      </div>`;
+  } catch(err) {
+    resultEl.innerHTML = `<p class="admin-empty-note" style="color:var(--red)">Hata: ${err.message}</p>`;
+  }
+}
+
+async function adminVerifyFoundCode() {
+  if (!_adminFoundSpin) return;
+  await adminVerifyCode(_adminFoundSpin.code);
+  document.getElementById('adminVerifyInput').value = '';
+  document.getElementById('adminVerifyResult').innerHTML = '';
+  _adminFoundSpin = null;
+}
+
+async function adminVerifyCode(code) {
+  try {
+    await sbVerifySpin(code);
+    await loadAdminKodlar();
+  } catch(err) {
+    alert('Onaylama hatası: ' + err.message);
+  }
 }
 
 /* ============================================================
@@ -900,6 +1204,8 @@ function logoutUser() {
   document.getElementById('authUser').style.display  = 'none';
   const adminBtn = document.getElementById('adminNavBtn');
   if (adminBtn) adminBtn.style.display = 'none';
+  const prizesNav = document.getElementById('navMyPrizes');
+  if (prizesNav) prizesNav.style.display = 'none';
 }
 
 function _setLoggedIn(username, is_admin) {
@@ -908,6 +1214,8 @@ function _setLoggedIn(username, is_admin) {
   document.getElementById('authUsername').textContent = username;
   const adminBtn = document.getElementById('adminNavBtn');
   if (adminBtn) adminBtn.style.display = is_admin ? '' : 'none';
+  const prizesNav = document.getElementById('navMyPrizes');
+  if (prizesNav) prizesNav.style.display = '';
 }
 
 /* ============================================================
@@ -1142,11 +1450,13 @@ function adminSwitchTab(tab) {
   document.getElementById('adminTabEvents').style.display  = tab === 'events'  ? '' : 'none';
   document.getElementById('adminTabGallery').style.display = tab === 'gallery' ? '' : 'none';
   document.getElementById('adminTabUsers').style.display   = tab === 'users'   ? '' : 'none';
+  document.getElementById('adminTabKodlar').style.display  = tab === 'kodlar'  ? '' : 'none';
   document.querySelectorAll('.admin-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.tab === tab);
   });
   if (tab === 'gallery') adminRenderGalleryList();
   if (tab === 'users') adminRenderUserList();
+  if (tab === 'kodlar') loadAdminKodlar();
 }
 
 /* ============================================================

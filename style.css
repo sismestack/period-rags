@@ -2662,3 +2662,406 @@ ul { list-style: none; }
   opacity: 0 !important;
   transition: opacity 0.15s ease;
 }
+
+/* ============================================================
+   WHEEL STATUS MESSAGE
+   ============================================================ */
+.wheel-status-msg {
+  margin: 14px auto 0;
+  max-width: 420px;
+  padding: 10px 18px;
+  border-radius: 4px;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+}
+.wheel-status-warn {
+  background: rgba(204,0,0,0.12);
+  border: 1px solid rgba(204,0,0,0.35);
+  color: #e87070;
+}
+.wheel-status-ok {
+  background: rgba(39,180,39,0.10);
+  border: 1px solid rgba(39,180,39,0.30);
+  color: #6dd46d;
+}
+
+/* NAV Ödüllerim link */
+.nav-link-prizes {
+  color: var(--gold-text) !important;
+}
+.nav-link-prizes:hover, .nav-link-prizes.active {
+  color: var(--gold) !important;
+}
+
+/* ============================================================
+   PRIZE CODE POPUP
+   ============================================================ */
+.prize-popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(4,2,2,0.88);
+  z-index: 3000;
+  align-items: center;
+  justify-content: center;
+}
+.prize-popup-overlay.open {
+  display: flex;
+}
+.prize-popup {
+  position: relative;
+  background: var(--bg3);
+  border: 1px solid rgba(204,0,0,0.38);
+  border-radius: 6px;
+  padding: 42px 40px 36px;
+  width: min(480px, 94vw);
+  text-align: center;
+  box-shadow: 0 0 60px rgba(204,0,0,0.25), 0 8px 40px rgba(0,0,0,0.7);
+  animation: prizePopIn 0.38s cubic-bezier(0.34,1.56,0.64,1) forwards;
+}
+@keyframes prizePopIn {
+  from { transform: scale(0.7); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.prize-popup-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(204,0,0,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.prize-popup-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 22px;
+}
+.pp-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(204,0,0,0.4));
+  max-width: 70px;
+}
+.pp-line:last-child {
+  background: linear-gradient(270deg, transparent, rgba(204,0,0,0.4));
+}
+.pp-title {
+  font-family: var(--font-head);
+  font-size: 1.05rem;
+  color: var(--red);
+  letter-spacing: 0.2em;
+}
+.prize-popup-icon {
+  font-size: 3.2rem;
+  line-height: 1;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 14px rgba(204,0,0,0.45));
+}
+.prize-popup-name {
+  font-family: var(--font-head);
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 26px;
+  letter-spacing: 0.04em;
+}
+.prize-popup-code-wrap {
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(204,0,0,0.22);
+  border-radius: 4px;
+  padding: 18px 20px 14px;
+  margin-bottom: 24px;
+}
+.prize-popup-code-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+  margin-bottom: 8px;
+}
+.prize-popup-code-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.prize-popup-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--gold-text);
+  letter-spacing: 0.12em;
+  user-select: all;
+}
+.prize-popup-copy-btn {
+  background: rgba(204,0,0,0.15);
+  border: 1px solid rgba(204,0,0,0.3);
+  color: var(--text);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 1rem;
+  transition: background 0.18s;
+}
+.prize-popup-copy-btn:hover { background: rgba(204,0,0,0.3); }
+.prize-popup-code-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+}
+.pp-link {
+  color: var(--gold-text);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.pp-link:hover { color: var(--gold); }
+.prize-popup-close-btn {
+  background: var(--red);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  padding: 12px 36px;
+  border-radius: 3px;
+  transition: background 0.18s;
+}
+.prize-popup-close-btn:hover { background: var(--red-bright); }
+
+/* ============================================================
+   ÖDÜLLERİM SAYFASI
+   ============================================================ */
+.myprizes-tab-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0;
+}
+.myprizes-tab {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+  padding: 10px 22px;
+  border-bottom: 2px solid transparent;
+  transition: color 0.18s, border-color 0.18s;
+}
+.myprizes-tab.active {
+  color: var(--red);
+  border-bottom-color: var(--red);
+}
+.myprizes-tab:hover { color: var(--text); }
+
+.myprizes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.myprize-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.myprize-used {
+  opacity: 0.55;
+  border-color: rgba(100,80,80,0.2);
+}
+.myprize-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.myprize-name {
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+.myprize-date {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+}
+.myprize-verified-badge {
+  font-size: 0.68rem;
+  color: #6dd46d;
+  letter-spacing: 0.08em;
+}
+.myprize-code-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.myprize-code {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold-text);
+  letter-spacing: 0.1em;
+  user-select: all;
+}
+.myprize-copy-btn {
+  background: rgba(204,0,0,0.12);
+  border: 1px solid rgba(204,0,0,0.25);
+  color: var(--text);
+  border-radius: 3px;
+  padding: 3px 8px;
+  font-size: 0.9rem;
+  transition: background 0.15s;
+}
+.myprize-copy-btn:hover { background: rgba(204,0,0,0.28); }
+
+/* ============================================================
+   ADMIN — KODLAR TAB
+   ============================================================ */
+.admin-kodlar-verify {
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 0;
+}
+.admin-verify-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.admin-verify-row input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  padding: 9px 14px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  letter-spacing: 0.06em;
+}
+.admin-verify-row input:focus { outline: 1px solid var(--red); }
+.admin-verify-result {
+  margin-top: 16px;
+}
+.admin-lookup-result {
+  background: var(--bg-card);
+  border: 1px solid rgba(204,0,0,0.3);
+  border-radius: 4px;
+  padding: 16px 18px;
+}
+.lookup-verified {
+  border-color: rgba(39,180,39,0.3);
+}
+.alr-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.alr-row:last-of-type { border-bottom: none; }
+.alr-label {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+  min-width: 70px;
+}
+.alr-val {
+  font-size: 0.85rem;
+  color: var(--text);
+  text-align: right;
+}
+.code-mono {
+  font-family: 'Courier New', monospace;
+  color: var(--gold-text);
+  letter-spacing: 0.1em;
+}
+.status-ok   { color: #6dd46d; font-weight: 600; }
+.status-pend { color: #e8b060; }
+.alr-btn {
+  margin-top: 14px;
+  width: 100%;
+}
+.admin-kodlar-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+@media (max-width: 700px) {
+  .admin-kodlar-grid { grid-template-columns: 1fr; }
+}
+.admin-kodlar-col {
+  padding: 22px 24px;
+  border-right: 1px solid var(--border);
+}
+.admin-kodlar-col:last-child { border-right: none; }
+.admin-spins-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+.admin-spin-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.spin-verified {
+  opacity: 0.6;
+  border-color: rgba(39,180,39,0.2);
+}
+.admin-spin-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.admin-spin-user {
+  font-family: var(--font-head);
+  font-size: 0.82rem;
+  color: var(--text);
+}
+.admin-spin-prize {
+  font-size: 0.8rem;
+  color: var(--gold-text);
+}
+.admin-spin-date {
+  font-size: 0.68rem;
+  color: var(--text-dim);
+}
+.admin-spin-vdate {
+  font-size: 0.68rem;
+  color: #6dd46d;
+}
+.admin-spin-code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--gold-text);
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+.admin-btn-verify {
+  background: rgba(39,180,39,0.15);
+  border: 1px solid rgba(39,180,39,0.35);
+  color: #6dd46d;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  border-radius: 3px;
+  transition: background 0.18s;
+  white-space: nowrap;
+}
+.admin-btn-verify:hover {
+  background: rgba(39,180,39,0.3);
+}
