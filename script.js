@@ -197,6 +197,15 @@ class PeriodBirdGame {
     this.bestScore = parseInt(localStorage.getItem('periodBirdBest') || '0');
     this._updateScoreDisplay();
 
+    // Milestone ödülleri
+    this.milestones = [
+      { score:  50, prize: 'Bird: %25 İndirim',      icon: '%',  label: '%25 İndirim',       note: 'Period Bird · 50 Puan' },
+      { score:  75, prize: 'Bird: %50 İndirim',      icon: '%',  label: '%50 İndirim',       note: 'Period Bird · 75 Puan' },
+      { score: 100, prize: 'Bird: Bedava Bira',       icon: '🍺', label: 'Bedava Bira',        note: 'Period Bird · 100 Puan' },
+      { score: 150, prize: 'Bird: İstediğin İçki',   icon: '🥃', label: 'İstediğin Bir İçki', note: 'Period Bird · 150 Puan' },
+    ];
+    this.milestonesHit = new Set();
+
     // Animation
     this.animFrame = null;
     this.birdWingAngle = 0;
@@ -268,6 +277,7 @@ class PeriodBirdGame {
     this.score = 0;
     this.pipeTimer = 0;
     this.bgX = 0;
+    this.milestonesHit = new Set();
     this._updateScoreDisplay();
 
     const startBtn = document.getElementById('startBtn');
@@ -351,6 +361,12 @@ class PeriodBirdGame {
         this.score++;
         this._updateScoreDisplay();
         this._checkBestScore();
+        // Milestone takibi
+        for (const m of this.milestones) {
+          if (!this.milestonesHit.has(m.score) && this.score >= m.score) {
+            this.milestonesHit.add(m.score);
+          }
+        }
       }
 
       // Collision (with small hitbox margin)
@@ -540,6 +556,23 @@ class PeriodBirdGame {
         .then(() => loadLeaderboard())
         .catch(() => {});
     }
+    // Milestone ödüllerini kontrol et
+    this._checkBirdRewards();
+  }
+
+  async _checkBirdRewards() {
+    if (!_currentUser) return;
+    const achieved = this.milestones.filter(m => this.milestonesHit.has(m.score));
+    if (!achieved.length) return;
+    const toReward = [];
+    for (const m of achieved) {
+      const claimed = await sbCheckBirdReward(_currentUser.username, m.prize);
+      if (!claimed) toReward.push(m);
+    }
+    if (!toReward.length) return;
+    toReward.sort((a, b) => b.score - a.score);
+    _birdRewardQueue.push(...toReward);
+    _showNextBirdReward();
   }
 
   _checkBestScore() {
@@ -556,6 +589,10 @@ class PeriodBirdGame {
     const bs = document.getElementById('bestScore');
     if (cs) cs.textContent = this.score;
     if (bs) bs.textContent = this.bestScore;
+    // Ulaşılan milestone satırlarını vurgula
+    document.querySelectorAll('.bird-ms-row').forEach(row => {
+      row.classList.toggle('bms-reached', this.score >= parseInt(row.dataset.score));
+    });
   }
 
 
@@ -572,6 +609,7 @@ class PeriodBirdGame {
     this.bird.y = this.H / 2;
     this.bird.vy = -2.5;
     this.state = 'playing';
+    this.milestonesHit = new Set();
     this._updateScoreDisplay();
 
     const restartBtn = document.getElementById('restartBtn');
@@ -587,6 +625,8 @@ class PeriodBirdGame {
     document.removeEventListener('keydown', this._keyHandler);
     this.canvas.removeEventListener('click', this._clickHandler);
     this.canvas.removeEventListener('touchstart', this._touchHandler);
+    _birdRewardQueue = [];
+    _popupOnCloseCallback = null;
   }
 }
 
@@ -879,20 +919,22 @@ async function spinWheel() {
 /* ============================================================
    PRIZE CODE POPUP
    ============================================================ */
-function showPrizeCodePopup(winner, code) {
+let _birdRewardQueue = [];
+let _popupOnCloseCallback = null;
+
+function showPrizeCodePopup(winner, code, subtitle) {
   document.getElementById('prizePopupIcon').textContent = winner.icon || '🎉';
   document.getElementById('prizePopupName').textContent = winner.label;
   const codeEl  = document.getElementById('prizePopupCode');
   const copyBtn = document.getElementById('prizePopupCopyBtn');
   const hintEl  = document.getElementById('prizePopupHint');
   const errNote = document.getElementById('prizePopupErrNote');
-  if (codeEl)  {
-    codeEl.textContent = code || 'Kaydediliyor...';
-    codeEl.classList.toggle('code-loading', !code);
-  }
+  const subEl   = document.getElementById('prizePopupSubtitle');
+  if (codeEl)  { codeEl.textContent = code || 'Kaydediliyor...'; codeEl.classList.toggle('code-loading', !code); }
   if (copyBtn) { copyBtn.textContent = '📋'; copyBtn.style.display = code ? '' : 'none'; }
   if (hintEl)  hintEl.style.display = code ? '' : 'none';
   if (errNote) { errNote.style.display = 'none'; errNote.textContent = ''; }
+  if (subEl)   { if (subtitle) { subEl.textContent = subtitle; subEl.style.display = ''; } else subEl.style.display = 'none'; }
   document.getElementById('prizePopupOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }
@@ -900,6 +942,28 @@ function showPrizeCodePopup(winner, code) {
 function closePrizePopup() {
   document.getElementById('prizePopupOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  const cb = _popupOnCloseCallback;
+  _popupOnCloseCallback = null;
+  if (cb) setTimeout(cb, 320);
+}
+
+async function _showNextBirdReward() {
+  if (!_birdRewardQueue.length || !_currentUser) return;
+  const m = _birdRewardQueue.shift();
+  if (_birdRewardQueue.length > 0) _popupOnCloseCallback = _showNextBirdReward;
+  showPrizeCodePopup({ label: m.label, icon: m.icon }, null, m.note);
+  try {
+    const spinData = await sbSaveWheelSpin(_currentUser.username, m.prize);
+    const codeEl  = document.getElementById('prizePopupCode');
+    const copyBtn = document.getElementById('prizePopupCopyBtn');
+    const hintEl  = document.getElementById('prizePopupHint');
+    if (codeEl)  { codeEl.textContent = spinData.code; codeEl.classList.remove('code-loading'); }
+    if (copyBtn) copyBtn.style.display = '';
+    if (hintEl)  hintEl.style.display = '';
+  } catch(e) {
+    const codeEl = document.getElementById('prizePopupCode');
+    if (codeEl) { codeEl.textContent = 'HATA'; codeEl.classList.remove('code-loading'); }
+  }
 }
 
 function copyPrizeCode() {

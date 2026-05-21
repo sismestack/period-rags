@@ -143,6 +143,14 @@ async function sbSaveScore(username, score) {
 /* ============================================================
    ÇARK — SPIN KODLARI
    ============================================================ */
+async function sbCheckBirdReward(username, prize) {
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await _sb.from('wheel_spins')
+    .select('id').eq('username', username).eq('prize', prize)
+    .gte('spun_at', weekAgo).maybeSingle();
+  return !!data;
+}
+
 async function sbCheckWeeklySpin(username) {
   const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data } = await _sb.from('wheel_spins')

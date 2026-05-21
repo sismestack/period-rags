@@ -2664,6 +2664,57 @@ ul { list-style: none; }
 }
 
 /* ============================================================
+   PERIOD BIRD — MILESTONE ÖDÜLLER
+   ============================================================ */
+.bird-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: 10px;
+}
+.bird-ms-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 11px;
+  background: rgba(204,0,0,0.06);
+  border: 1px solid rgba(204,0,0,0.13);
+  border-radius: 3px;
+  transition: background 0.22s, border-color 0.22s;
+}
+.bird-ms-row.bms-reached {
+  background: rgba(201,162,39,0.13);
+  border-color: rgba(201,162,39,0.38);
+}
+.bm-score {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--red);
+  letter-spacing: 0.04em;
+  min-width: 38px;
+}
+.bird-ms-row.bms-reached .bm-score { color: var(--gold-text); }
+.bm-prize {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  letter-spacing: 0.03em;
+}
+.bird-ms-row.bms-reached .bm-prize { color: var(--text); }
+
+/* Prize popup subtitle (Period Bird source label) */
+.prize-popup-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-text);
+  opacity: 0.65;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+/* ============================================================
    WHEEL STATUS MESSAGE
    ============================================================ */
 .wheel-status-msg {
