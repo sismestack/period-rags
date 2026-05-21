@@ -833,6 +833,12 @@ async function _refreshWheelStatus() {
     return;
   }
 
+  if (_currentUser.is_admin) {
+    statusEl.style.display = 'none';
+    spinBtn.disabled = false;
+    return;
+  }
+
   try {
     const existing = await sbCheckWeeklySpin(_currentUser.username);
     if (existing) {
@@ -867,20 +873,22 @@ async function spinWheel() {
 
   if (spinBtn) spinBtn.disabled = true;
 
-  try {
-    const existing = await sbCheckWeeklySpin(_currentUser.username);
-    if (existing) {
-      if (statusEl) {
-        statusEl.style.display = 'block';
-        statusEl.className = 'wheel-status-msg wheel-status-warn';
-        const d = new Date(existing.spun_at);
-        const nextSpin = new Date(d.getTime() + 7 * 24 * 60 * 60 * 1000);
-        const days = Math.ceil((nextSpin - Date.now()) / (1000 * 60 * 60 * 24));
-        statusEl.textContent = `Bu hafta çevirmişsin. ${days} gün sonra tekrar deneyebilirsin.`;
+  if (!_currentUser.is_admin) {
+    try {
+      const existing = await sbCheckWeeklySpin(_currentUser.username);
+      if (existing) {
+        if (statusEl) {
+          statusEl.style.display = 'block';
+          statusEl.className = 'wheel-status-msg wheel-status-warn';
+          const d = new Date(existing.spun_at);
+          const nextSpin = new Date(d.getTime() + 7 * 24 * 60 * 60 * 1000);
+          const days = Math.ceil((nextSpin - Date.now()) / (1000 * 60 * 60 * 24));
+          statusEl.textContent = `Bu hafta çevirmişsin. ${days} gün sonra tekrar deneyebilirsin.`;
+        }
+        return;
       }
-      return;
-    }
-  } catch { /* izin ver */ }
+    } catch { /* izin ver */ }
+  }
 
   wheelGame.spinAsync(async (winner) => {
     if (!_currentUser) return;
