@@ -681,13 +681,9 @@ async function loadLeaderboard() {
 
 class PeriodWheel {
   constructor() {
-    // Dilimler saat yönünde, tepedeki kafatası sınırından başlayarak:
-    // 0=Tanışalım mı Kokteyl (22.5°), 1=Bira (67.5°), 2=5.000$ (112.5°),
-    // 3=%50 İndirim (157.5°), 4=Bedava Bira (202.5°), 5=Premium Viski (247.5°),
-    // 6=Büyük Ödül Nightblade (292.5°), 7=Adri Special (337.5°)
-    // Dilimler çarrk.png'deki saat yönü sırasına göre (her biri 45°, merkez i*45+22.5°):
-    // 0=Nightblade(22.5°) 1=Adri Special(67.5°) 2=Tanışalım mı?(112.5°) 3=Bira(157.5°)
-    // 4=$5000(202.5°) 5=%50 İndirim(247.5°) 6=Bedava İçki(292.5°) 7=İstediğin Bir Kokteyl(337.5°)
+    // Dilimler çarrk.png'de saat yönünde, merkez i*45° (0°=tepe):
+    // 0=Nightblade(0°) 1=Adri Special(45°) 2=Tanışalım mı?(90°) 3=Bira(135°)
+    // 4=$5000(180°) 5=%50 İndirim(225°) 6=Bedava İçki(270°) 7=İstediğin Bir Kokteyl(315°)
     this.prizes = [
       { label: 'Büyük Ödül Nightblade', weight: 0,     icon: '🏍', rarity: 'İMKANSIZ'           },
       { label: 'Adri Special',          weight: 3,     icon: '⭐', rarity: 'AŞIRI ZOR'            },
@@ -738,7 +734,7 @@ class PeriodWheel {
     // rotate(θ) sonrası tepede (0°) gösterilen dilim: orijinal görüntüde (360-θ)°'de olanlar.
     // Dilim i merkezi orijinal görüntüde: i*45+22.5°
     // Dilim i'yi tepeye getirmek için: θ = 360 - (i*45+22.5)
-    const winnerCenter = winnerIndex * this.sliceAngle + this.sliceAngle / 2;
+    const winnerCenter = winnerIndex * this.sliceAngle;
     const targetBase   = (360 - winnerCenter + 360) % 360;
 
     const currentMod = ((this.currentRotation % 360) + 360) % 360;
@@ -797,7 +793,7 @@ class PeriodWheel {
 
     const winnerIndex = this._pickWinner();
 
-    const winnerCenter  = winnerIndex * this.sliceAngle + this.sliceAngle / 2;
+    const winnerCenter  = winnerIndex * this.sliceAngle;
     const targetBase    = (360 - winnerCenter + 360) % 360;
     const currentMod    = ((this.currentRotation % 360) + 360) % 360;
     let delta           = (targetBase - currentMod + 360) % 360;
